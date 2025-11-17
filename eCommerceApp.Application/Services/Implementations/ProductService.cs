@@ -50,7 +50,7 @@ namespace eCommerceApp.Application.Services.Implementations
             return _mapper.Map<GetProduct>(product);
         }
 
-        public async Task<ServiceResponse> UpdateAsync(UpdateProduct product)
+        public async Task<ServiceResponse> UpdateAsync(UpdateProduct product) //There are a problem in update and update of generic repo
         {
             var mappedData = _mapper.Map<Product>(product);
             int result = await _productInterface.UpdateAsync(mappedData);

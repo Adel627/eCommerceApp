@@ -1,5 +1,6 @@
 ﻿using eCommerceApp.Domain.Interfaces;
 using eCommerceApp.Infrastructure.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceApp.Infrastructure.Repositories
@@ -22,8 +23,8 @@ namespace eCommerceApp.Infrastructure.Repositories
 
         public async Task<int> AddAsync(TEntity entity)
         {
-            await _context.Set<TEntity>().AddAsync(entity);
-            return await _context.SaveChangesAsync();
+                await _context.Set<TEntity>().AddAsync(entity);
+                return await _context.SaveChangesAsync();
         }
 
         public async Task<int> UpdateAsync(TEntity entity)
