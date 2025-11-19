@@ -1,5 +1,9 @@
 ﻿using eCommerceApp.Application.Services.Implementations;
+using eCommerceApp.Application.Services.Implementations.Authentication;
 using eCommerceApp.Application.Services.Interfaces;
+using eCommerceApp.Application.Services.Interfaces.Authentication;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +23,14 @@ namespace eCommerceApp.Application.DependencyInjection
             mappingconfig.Scan(Assembly.GetExecutingAssembly());
             services.AddSingleton<IMapper>(new Mapper(mappingconfig));
 
+            //Add Fluentvalidation
+            services.AddFluentValidationAutoValidation()
+             .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+            
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             return services;
         }
     }

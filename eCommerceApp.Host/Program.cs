@@ -1,14 +1,17 @@
 
 using eCommerceApp.Application.DependencyInjection;
+using eCommerceApp.Domain.Entities.Identity;
 using eCommerceApp.Infrastructure.DependencyInjection;
 using eCommerceApp.Infrastructure.Middelwares;
+using eCommerceApp.Infrastructure.Seeds;
+using Microsoft.AspNetCore.Identity;
 using Serilog;
 
 namespace eCommerceApp.Host
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task  Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -59,9 +62,21 @@ namespace eCommerceApp.Host
 
                 app.UseAuthorization();
 
+                //Add Seeding
+                var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+                using var scope = scopeFactory.CreateScope();
+
+                var roleManger = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var userManger = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+
+                await DefaultRoles.SeedAsync(roleManger);
+                await DefaultUsers.SeedAsync(userManger);
+
 
                 app.MapControllers();
                 Log.Logger.Information("Application is running.......");
+
+
 
                 app.Run();
             }

@@ -19,7 +19,7 @@ namespace eCommerceApp.Infrastructure.Middelwares
           } catch (DbUpdateException ex)  { 
 
                 var logger = context.RequestServices.GetRequiredService<IAppLogger<ExceptionHandlingMiddleware>>();
-               context.Response.ContentType = "application/json";
+              // context.Response.ContentType = "application/json";
 
                 if (ex.InnerException is SqlException innerException)
                 { 
@@ -29,24 +29,24 @@ namespace eCommerceApp.Infrastructure.Middelwares
                     { 
                         case 2627: //Unique CVonstraint Violation"
                             context.Response.StatusCode = StatusCodes.Status409Conflict;
-                            await context.Response.WriteAsync("Unique CVonstraint Violation");
+                            await context.Response.WriteAsJsonAsync("Unique CVonstraint Violation");
                             break; 
                         
 
                         case 515: //Cannot insert null
                             context.Response.StatusCode = StatusCodes.Status409Conflict; 
-                            await context.Response.WriteAsync("Cannot insert null");
+                            await context.Response.WriteAsJsonAsync("Cannot insert null");
                             break; 
 
 
                         case 547: //Foreign key constraint violation
                               context.Response.StatusCode = StatusCodes.Status409Conflict;
-                            await context.Response.WriteAsync("Foreign key constraint violation");
+                            await context.Response.WriteAsJsonAsync("Foreign key constraint violation");
                             break;
                         
                         
                         default : context.Response.StatusCode = StatusCodes.Status409Conflict;
-                            await context.Response.WriteAsync("An error occured while processing your request");
+                            await context.Response.WriteAsJsonAsync("An error occured while processing your request");
                             break; 
                     } 
                 
@@ -54,15 +54,15 @@ namespace eCommerceApp.Infrastructure.Middelwares
                 {
                              logger.LogError(ex, "Related EfCore Exception");
                              context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                             await context.Response.WriteAsync("An error occured while saving entity changes");
+                             await context.Response.WriteAsJsonAsync("An error occured while saving entity changes");
                 }
           } catch (Exception ex) 
           { 
                 var logger = context.RequestServices.GetRequiredService<IAppLogger<ExceptionHandlingMiddleware>>();
                 logger.LogError(ex, "Unknown Exception");
-                context.Response.ContentType = "application/json"; 
+               // context.Response.ContentType = "application/json"; 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsync("An error occured "+ex.Message);
+                await context.Response.WriteAsJsonAsync("An error occured "+ex.Message);
             
           } 
         } 

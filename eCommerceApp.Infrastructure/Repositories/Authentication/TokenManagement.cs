@@ -1,43 +1,84 @@
-﻿using eCommerceApp.Domain.Interfaces.Authentication;
+﻿using eCommerceApp.Domain.Entities.Identity;
+using eCommerceApp.Domain.Interfaces.Authentication;
+using eCommerceApp.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace eCommerceApp.Infrastructure.Repositories.Authentication
 {
-    public class TokenManagement() : ITokenManagement
+    public class TokenManagement( AppDbContext context , IConfiguration config) : ITokenManagement
     {
-        public Task<int> AddRefreshToken(string userId, string refreshToken)
+        private readonly AppDbContext _context = context;
+        private readonly IConfiguration _config = config;
+
+        public async Task<int> AddRefreshToken(string userId, string refreshToken)
         {
-            throw new NotImplementedException();
+            var RefreshToken = new RefreshToken()
+            {
+                UserId = userId,
+                Token = refreshToken
+            };
+            await _context.AddAsync(RefreshToken);
+            return await _context.SaveChangesAsync();
         }
 
         public string GenerateToken(List<Claim> claims)
         {
-            throw new NotImplementedException();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]!));
+            var token = new JwtSecurityToken(
+                issuer: _config["JWT:Issuer"],
+                audience: _config["JWT:Audience"],
+                expires: DateTime.UtcNow.AddHours(2),
+                claims: claims,
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+                       );
+            return new JwtSecurityTokenHandler().WriteToken(token); 
         }
 
         public string GetRefreshToken()
         {
-            throw new NotImplementedException();
+            const int byteSize = 64;
+            byte[] randomBytes = new byte[byteSize];
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return Convert.ToBase64String(randomBytes);
         }
 
-        public List<Claim> GetUserClaimsFromToken(string email)
+        public List<Claim> GetUserClaimsFromToken(string token)
         {
-            throw new NotImplementedException();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            if (jwtToken == null) return [];
+           return jwtToken.Claims.ToList();
         }
 
-        public Task<string> GetUserIdByRefreshToken(string refreshToken)
+        public async Task<string> GetUserIdByRefreshToken(string refreshToken) =>
+         (await  _context.RefreshTokens.FirstOrDefaultAsync( r => r.Token ==  refreshToken))!.UserId;
+      
+
+        public async Task<int> UpdateRefreshToken(string userId, string refreshToken)
         {
-            throw new NotImplementedException();
+           var userToken = 
+                await _context.RefreshTokens.FirstOrDefaultAsync( r => r.UserId == userId);  
+           if(userToken == null) return -1;
+
+            userToken.Token = refreshToken;
+            return await _context.SaveChangesAsync();
         }
 
-        public Task<int> UpdateRefreshToken(string userId, string refreshToken)
+        public async Task<bool> ValidateRefreshToken(string refreshToken)
         {
-            throw new NotImplementedException();
-        }
+            var userRefreshToken =
+                await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token.Equals(refreshToken));
 
-        public Task<bool> ValidateRefreshToken(string refreshToken)
-        {
-            throw new NotImplementedException();
+            return userRefreshToken != null;
         }
     }
 }

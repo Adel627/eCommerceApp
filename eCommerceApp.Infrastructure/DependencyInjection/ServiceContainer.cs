@@ -2,9 +2,11 @@
 using eCommerceApp.Domain.Entities;
 using eCommerceApp.Domain.Entities.Identity;
 using eCommerceApp.Domain.Interfaces;
+using eCommerceApp.Domain.Interfaces.Authentication;
 using eCommerceApp.Infrastructure.Data;
 using eCommerceApp.Infrastructure.Middelwares;
 using eCommerceApp.Infrastructure.Repositories;
+using eCommerceApp.Infrastructure.Repositories.Authentication;
 using eCommerceApp.Infrastructure.Services;
 using EntityFramework.Exceptions.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,14 +30,17 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
             options.UseSqlServer(config.GetConnectionString("Default") ,
             sqloptions =>
             { //Ensure That this is The Correct Assembly
-                sqloptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
-                sqloptions.EnableRetryOnFailure(); //Enable automatic retries for transient failures
-            }).UseExceptionProcessor() , //To Enable make exceptions of Db
+                sqloptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName); // put migrations folder in the project where the appdbcontext in .
+                sqloptions.EnableRetryOnFailure();  //Enable automatic retries for transient failures
+            }).UseExceptionProcessor() ,  //To Enable make exceptions of Db (Convert exceptions of DB to Known Exceptions)
             ServiceLifetime.Scoped );
 
             Services.AddScoped<IGeneric<Product>, GenericRepository<Product>>();
             Services.AddScoped<IGeneric<Category>, GenericRepository<Category>>();
             Services.AddScoped(typeof(IAppLogger<>), typeof(SerilogLoggerAdapter<>));
+            Services.AddScoped<IUserManagement , UserManagement>();
+            Services.AddScoped<ITokenManagement , TokenManagement>();
+            Services.AddScoped<IRoleManagement , RoleManagement>();
 
             Services.AddDefaultIdentity<AppUser>(options =>
             {
@@ -57,7 +62,8 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+            })
+            .AddJwtBearer(options =>
             {
                 options.SaveToken = true;
                 options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
