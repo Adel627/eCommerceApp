@@ -14,6 +14,7 @@ namespace eCommerceApp.Application.Validations.Authentication
                 .Length(5 ,30);
 
             RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("Email is required")
                 .EmailAddress().WithMessage("Invalid email format.");
 
             RuleFor(x => x.Password)

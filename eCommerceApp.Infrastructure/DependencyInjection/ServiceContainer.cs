@@ -38,9 +38,9 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
             Services.AddScoped<IGeneric<Product>, GenericRepository<Product>>();
             Services.AddScoped<IGeneric<Category>, GenericRepository<Category>>();
             Services.AddScoped(typeof(IAppLogger<>), typeof(SerilogLoggerAdapter<>));
+            Services.AddScoped<IRoleManagement , RoleManagement>();
             Services.AddScoped<IUserManagement , UserManagement>();
             Services.AddScoped<ITokenManagement , TokenManagement>();
-            Services.AddScoped<IRoleManagement , RoleManagement>();
 
             Services.AddDefaultIdentity<AppUser>(options =>
             {

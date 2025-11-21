@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace eCommerceApp.Application.DTOs.Authentication
 {
     public class CreateUser
     {
-        public required string FullName { get; set; } = string.Empty;
-        public required string Email { get; set; } = string.Empty;
-        public required string Password { get; set; } = string.Empty;
-        public required string ConfirmPassword { get; set; } = string.Empty;
+        [Required]
+        public  string FullName { get; set; } =string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public  string Password { get; set; } = string.Empty;
+        public  string ConfirmPassword { get; set; } = string.Empty;
     }
 }

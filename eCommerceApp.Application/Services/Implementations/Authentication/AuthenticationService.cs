@@ -38,17 +38,53 @@ namespace eCommerceApp.Application.Services.Implementations.Authentication
                    $"User With email : {mappedData.Email} failed to add to role : User"),
                    "User can not add to User role");
             return new ServiceResponse(false, "An error occure when add User to the Role");
-        
         }
 
-        public Task<LoginResponse> LoginUser(LoginUser user)
+        public async Task<LoginResponse> LoginUser(LoginUser user)
         {
-            throw new NotImplementedException();
+            var mappedData = _mapper.Map<AppUser>(user);
+            mappedData.PasswordHash = user.Password;
+            bool result = await _userManagement.LoginUser(mappedData);
+            if(!result)
+                return new LoginResponse(Message:"Invalid Email or Password");
+           
+            var appUser = await _userManagement.GetUserByEmail(mappedData.Email!);
+           var claims = await _userManagement.GetUserClaims(appUser!.Email!);
+
+           var jwtToken =  _tokenManagement.GenerateToken(claims);
+            var refreshToken = _tokenManagement.GetRefreshToken();
+
+            int saveTokenResult = 0;
+            bool userTokenCheck = await _tokenManagement.ValidateRefreshToken(refreshToken);
+            if (userTokenCheck)
+                saveTokenResult = await _tokenManagement.UpdateRefreshToken(appUser.Id, refreshToken);
+            else
+                saveTokenResult = await _tokenManagement.AddRefreshToken(appUser.Id, refreshToken);
+            return saveTokenResult > 0 ?
+             new LoginResponse( Success: true, Token: jwtToken, RefreshToken: refreshToken)
+             : new LoginResponse(Message: "Internal error occured while Authentication");
         }
 
-        public Task<LoginResponse> ReviveToken(string refreshToken)
+        public async Task<LoginResponse> ReviveToken(string refreshToken)
         {
-            throw new NotImplementedException();
+            bool valid = await _tokenManagement.ValidateRefreshToken(refreshToken);
+            if (!valid)
+               return new LoginResponse(Message: "Invalid token");
+
+            var userId = await _tokenManagement.GetUserIdByRefreshToken(refreshToken);
+            AppUser user = await _userManagement.GetUserById(userId);
+
+            var claims = await _userManagement.GetUserClaims(user.Email!);
+            var jwtToken = _tokenManagement.GenerateToken(claims);
+
+            var newRefreshToken = _tokenManagement.GetRefreshToken();
+           int update = await _tokenManagement.UpdateRefreshToken(userId, newRefreshToken);
+
+           return update <= 0 ?
+                 new LoginResponse(Message: "Invalid token")
+                :new LoginResponse(Success: true, Token: jwtToken, RefreshToken: newRefreshToken);
+                 
+
         }
     }
 }

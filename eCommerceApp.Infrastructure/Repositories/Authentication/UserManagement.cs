@@ -7,10 +7,10 @@ using System.Security.Claims;
 
 namespace eCommerceApp.Infrastructure.Repositories.Authentication
 {
-    public class UserManagement(UserManager<AppUser> userManager , RoleManagement roleManagement ,  AppDbContext context) : IUserManagement
+    public class UserManagement(UserManager<AppUser> userManager , IRoleManagement roleManagement ,  AppDbContext context) : IUserManagement
     {
         private readonly UserManager<AppUser> _userManager = userManager;
-        private readonly RoleManagement _roleManagement = roleManagement;
+        private readonly IRoleManagement _roleManagement = roleManagement;
         private readonly AppDbContext _context = context;
 
         public async Task<bool> CreateUser(AppUser user)
@@ -57,7 +57,7 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
             string? roleName = await _roleManagement.GetUserRole(user.Email!);
              if(string.IsNullOrEmpty(roleName)) return false; 
 
-            return await _userManager.CheckPasswordAsync(user  ,user.PasswordHash!);
+            return await _userManager.CheckPasswordAsync(userExists  ,user.PasswordHash!);
         }
 
         public async Task<int> RemoveUserByEmail(string email)
