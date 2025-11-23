@@ -24,6 +24,15 @@ namespace eCommerceApp.Host.Controllers
             var Category = await _categoryService.GetByIdAsync(id);
             return Category.Name == null ? NotFound(Category) : Ok(Category);
         }
+
+        [HttpGet("products-by-category/{categoryId}")]
+        public async Task<IActionResult> GetProductsByCategory(Guid categoryId)
+        {
+            var Category = 
+                await _categoryService.GetProductsByCategoryAsync(categoryId);
+            return Category.Any() ?  Ok(Category) : NotFound(Category);
+        }
+
         [HttpPost("add")]
         public async Task<IActionResult> Add(CreateCategory model)
         {
@@ -46,5 +55,7 @@ namespace eCommerceApp.Host.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
 
         }
+
+
     }
 }

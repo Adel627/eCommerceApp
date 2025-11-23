@@ -11,10 +11,7 @@ namespace eCommerceApp.Application.Mapping
     {
         public void Register(TypeAdapterConfig config)
         {
-            config.NewConfig<Product, GetProduct>()
-                 .Map(dest => dest.Base64Image, src => src.Image);
-            config.NewConfig<CreateProduct, Product>()
-               .Map(dest => dest.Image, src => src.Base64Image);
+            
         }
     }
 }

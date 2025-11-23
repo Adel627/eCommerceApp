@@ -66,10 +66,10 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
          (await  _context.RefreshTokens.FirstOrDefaultAsync( r => r.Token ==  refreshToken))!.UserId;
       
 
-        public async Task<int> UpdateRefreshToken(string userId, string refreshToken)
+        public async Task<int> UpdateRefreshToken(string userId,string oldRefreshToken , string refreshToken)
         {
            var userToken = 
-                await _context.RefreshTokens.FirstOrDefaultAsync( r => r.UserId == userId);  
+                await _context.RefreshTokens.FirstOrDefaultAsync( r => r.UserId == userId && r.Token == oldRefreshToken);  
            if(userToken == null) return -1;
 
             userToken.Token = refreshToken;

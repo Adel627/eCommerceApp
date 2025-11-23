@@ -19,7 +19,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
 using System.Text;
 
 
@@ -46,6 +45,13 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
             Services.AddScoped<ITokenManagement , TokenManagement>();
             Services.AddScoped<IPaymentMethod , PaymentMethodRepository>();
             Services.AddScoped<IPaymentService , StripePaymentService>();
+            Services.AddScoped<ICart , CartRepository>();
+            Services.AddScoped<ICategoryRepository , CategoryRepository>();
+
+            //Stripe configurations
+
+            Stripe.StripeConfiguration.ApiKey = config["Stripe:SecretKey"];
+
 
             Services.AddDefaultIdentity<AppUser>(options =>
             {

@@ -35,6 +35,7 @@ namespace eCommerceApp.Application.DependencyInjection
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            services.AddScoped<ICartService , CartService>();
             return services;
         }
     }
