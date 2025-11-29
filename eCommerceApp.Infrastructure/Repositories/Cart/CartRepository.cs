@@ -12,14 +12,19 @@ namespace eCommerceApp.Infrastructure.Repositories.Cart
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<IEnumerable<Achieve>> GetAllCheckoutHistory()
+        public Task<IEnumerable<Achieve>> GetAllCheckoutHistory()
         {
-            return await _context.CheckoutAchieves.AsNoTracking().ToListAsync();
+            throw new NotImplementedException();
         }
+
+        //public async Task<IEnumerable<Achieve>> GetAllCheckoutHistory()
+        //{
+        //    //return await _context.CheckoutAchieves.AsNoTracking().ToListAsync();
+        //}
 
         public async Task<int> SaveCheckoutHistory(IEnumerable<Achieve> checkouts)
         {
-             _context.CheckoutAchieves.AddRange(checkouts);
+          //  _context.CheckoutAchieves.AddRange(checkouts);
             return await _context.SaveChangesAsync();
         }
     }

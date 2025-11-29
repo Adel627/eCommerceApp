@@ -13,12 +13,12 @@ using System.Text;
 
 namespace eCommerceApp.Application.Services.Implementations.Cart
 {
-    public class CartService(ICart cart, IMapper mapper, IGeneric<Product> productInterface,
+    public class CartService(ICart cart, IMapper mapper, IProductRepository productInterface,
                        IPaymentMethod paymentMethod, IPaymentService paymentService , IUserManagement userManagement) : ICartService
     {
         private readonly ICart _cart = cart;
         private readonly IMapper _mapper = mapper;
-        private readonly IGeneric<Product> _productInterface = productInterface;
+        private readonly IProductRepository _productInterface = productInterface;
         private readonly IPaymentMethod _paymentMethod = paymentMethod;
         private readonly IPaymentService _paymentService = paymentService;
         private readonly IUserManagement _userManagement = userManagement;

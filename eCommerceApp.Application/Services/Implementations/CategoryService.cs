@@ -1,30 +1,32 @@
-﻿
-using eCommerceApp.Application.DTOs;
+﻿using eCommerceApp.Application.DTOs;
 using eCommerceApp.Application.DTOs.Category;
 using eCommerceApp.Application.DTOs.Product;
+using eCommerceApp.Application.Helpers;
 using eCommerceApp.Application.Services.Interfaces;
 using eCommerceApp.Domain.Entities;
 using eCommerceApp.Domain.Interfaces;
 using MapsterMapper;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eCommerceApp.Application.Services.Implementations
 {
-    public class CategoryService(IGeneric<Category> categoryInterface, IMapper mapper
-           , ICategoryRepository categorySpecifies) : ICategoryService
+    public class CategoryService(ICategoryRepository categoryRepository , IMapper mapper , IImageService imageService) : ICategoryService
     {
-
-        private readonly IGeneric<Category> _categoryInterface = categoryInterface;
+        private readonly ICategoryRepository _categoryRepository= categoryRepository;
         private readonly IMapper _mapper = mapper;
-        private readonly ICategoryRepository _categorySpecifies = categorySpecifies;
-
+        private readonly IImageService _imageService = imageService;
 
         public async Task<ServiceResponse> AddAsync(CreateCategory Category)
         {
+            var imageName = $"{Guid.NewGuid()}{Path.GetExtension(Category.Image.FileName)}";
+            var imageUploadedResult = await _imageService.UploadImage(Category.Image, imageName, "Images/Category");
+
+            if (!imageUploadedResult.upload)
+                return new ServiceResponse(false, imageUploadedResult.errorMessage!);
+
             var mappedData = _mapper.Map<Category>(Category);
-            int result = await _categoryInterface.AddAsync(mappedData);
+            mappedData.Image = $"Images/Category/{imageName}";
+
+            int result = await _categoryRepository.AddAsync(mappedData);
             return result > 0 ? new ServiceResponse(true, "Category added!")
                 : new ServiceResponse(false, "Category failed to be added!");
 
@@ -32,44 +34,75 @@ namespace eCommerceApp.Application.Services.Implementations
 
         public async Task<ServiceResponse> DeleteAsync(Guid id)
         {
-            int result = await _categoryInterface.DeleteAsync(id);
+            int result = await _categoryRepository.ToggleDelete(id);
             return result > 0 ? new ServiceResponse(true, "Category deleted!")
                 : new ServiceResponse(false, "Category failed to be deleted!");
         }
 
-        public async Task<IEnumerable<GetCategory>> GetAllAsync()
+        public async Task<IEnumerable<GetCategoryDetails>> GetAllAsync()
         {
-            var Categories = await _categoryInterface.GetAllAsync();
+            var Categories = await _categoryRepository.GetAllAsync();
+            if (!Categories.Any())
+                return [];
+            var mappedData = _mapper.Map<IEnumerable<GetCategoryDetails>>(Categories);
+            return mappedData;
+
+        }
+        public async Task<IEnumerable<GetCategory>> GetCurrentAsync()
+        {
+            var Categories = await _categoryRepository.GetCurrentAsync();
             if (!Categories.Any())
                 return [];
             var mappedData = _mapper.Map<IEnumerable<GetCategory>>(Categories);
             return mappedData;
 
         }
-
-        public async Task<GetCategory> GetByIdAsync(Guid id)
+        public async Task<GetCategoryDetails> GetByIdAsync(Guid id)
         {
-            var Category = await _categoryInterface.GetByIdAsync(id);
+            var Category = await _categoryRepository.GetByIdAsync(id);
+            if (Category is null)
+                return new GetCategoryDetails();
+            return _mapper.Map<GetCategoryDetails>(Category);
+        }
+        public async Task<GetCategory> GetCurrentByIdAsync(Guid id)
+        {
+            var Category = await _categoryRepository.GetCurrentByIdAsync(id);
             if (Category is null)
                 return new GetCategory();
             return _mapper.Map<GetCategory>(Category);
         }
 
-        public async Task<IEnumerable<GetProduct>> GetProductsByCategoryAsync(Guid categoryId)
+        //public async Task<IEnumerable<GetProduct>> GetCategoryWithProductsAsync(Guid categoryId)
+        //{
+        //    var products =
+        //        await _categoryRepository.GetCategoryWithProductsAsync(categoryId);
+
+        //    if (!products.Any())  return [];
+
+        //    return _mapper.Map<IEnumerable<GetProduct>>(products);
+
+        //}
+
+        public async Task<ServiceResponse> UpdateAsync(UpdateCategory CategoryDto)
         {
-            var products =
-                await _categorySpecifies.GetProductsByCategoryAsync(categoryId);
+             var currentCategory = await _categoryRepository.GetByIdAsync(CategoryDto.Id);
+            if (currentCategory is null)
+                return new ServiceResponse(false, "There are no category with the given id");
 
-            if (!products.Any())  return [];
+            //delete image and save new image
+             _imageService.Delete(currentCategory.Image);
 
-            return _mapper.Map<IEnumerable<GetProduct>>(products);
-               
-        }
+            var imageName = $"{Guid.NewGuid()}{Path.GetExtension(CategoryDto.Image.FileName)}";
+            var imageUploadedResult = await _imageService.UploadImage(CategoryDto.Image, imageName, "Images/Category");
 
-        public async Task<ServiceResponse> UpdateAsync(UpdateCategory Category)
-        {
-            var mappedData = _mapper.Map<Category>(Category);
-            int result = await _categoryInterface.UpdateAsync(mappedData);
+            if (!imageUploadedResult.upload)
+                return new ServiceResponse(false, imageUploadedResult.errorMessage!);
+
+            _mapper.Map(CategoryDto , currentCategory);
+            currentCategory.Image = $"Images/Category/{imageName}";
+            currentCategory.UpdatedDate = DateTime.UtcNow;
+
+            int result = await _categoryRepository.UpdateAsync(currentCategory);
             return result > 0 ? new ServiceResponse(true, "Category Updated!")
                : new ServiceResponse(false, "Category failed to be Updated!");
         }

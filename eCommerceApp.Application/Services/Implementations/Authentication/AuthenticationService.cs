@@ -1,4 +1,5 @@
-﻿using eCommerceApp.Application.DTOs;
+﻿using eCommerceApp.Application.Consts;
+using eCommerceApp.Application.DTOs;
 using eCommerceApp.Application.DTOs.Authentication;
 using eCommerceApp.Application.Services.Interfaces.Authentication;
 using eCommerceApp.Application.Services.Interfaces.Logging;
@@ -23,14 +24,21 @@ namespace eCommerceApp.Application.Services.Implementations.Authentication
 
         public async Task<ServiceResponse> CreateUser(CreateUser user)
         {
+            if(await _userManagement.CheckeByUserName(user.UserName))
+                return new ServiceResponse(false, "Already user found with this userName. ");
+
+            if(await _userManagement.CheckeByPhoneNumber(user.PhoneNumber))
+                return new ServiceResponse(false, "Already user found with this phoneNumber. ");
+
+
             var mappedData = _mapper.Map<AppUser>(user);
-            mappedData.UserName = user.Email;
             mappedData.PasswordHash = user.Password;
 
            var result = await _userManagement.CreateUser(mappedData);
             if (!result) 
                 return new ServiceResponse(false, "Already user found with this email. ");
-           var IsAdded = await _roleManagement.AddUserToRole(mappedData, "User");
+         
+            var IsAdded = await _roleManagement.AddUserToRole(mappedData, Roles.User);
             if (IsAdded) 
                 return new ServiceResponse(true, "User Created");
 
@@ -42,23 +50,21 @@ namespace eCommerceApp.Application.Services.Implementations.Authentication
 
         public async Task<LoginResponse> LoginUser(LoginUser user)
         {
+
             var mappedData = _mapper.Map<AppUser>(user);
             mappedData.PasswordHash = user.Password;
+            mappedData.Email = user.EmailorUserName;
+
             bool result = await _userManagement.LoginUser(mappedData);
             if(!result)
-                return new LoginResponse(Message:"Invalid Email or Password");
+                return new LoginResponse(Message:"Invalid Email / UserName or Password");
            
-            var appUser = await _userManagement.GetUserByEmail(mappedData.Email!);
-           var claims = await _userManagement.GetUserClaims(appUser!.Email!);
+            var appUser = await _userManagement.GetUserByEmailOrUserName(user.EmailorUserName);
+            var claims = await _userManagement.GetUserClaims(appUser!.Email!);
 
-           var jwtToken =  _tokenManagement.GenerateToken(claims);
+            var jwtToken =  _tokenManagement.GenerateToken(claims);
             var refreshToken = _tokenManagement.GetRefreshToken();
 
-            //int saveTokenResult = 0;
-            //bool userTokenCheck = await _tokenManagement.ValidateRefreshToken(refreshToken);
-            //if (userTokenCheck)
-            //    saveTokenResult = await _tokenManagement.UpdateRefreshToken(appUser.Id, refreshToken);
-            //else
               int  saveTokenResult = await _tokenManagement.AddRefreshToken(appUser.Id, refreshToken);
             return saveTokenResult > 0 ?
              new LoginResponse( Success: true, Token: jwtToken, RefreshToken: refreshToken)

@@ -3,7 +3,9 @@ using eCommerceApp.Domain.Interfaces.Authentication;
 using eCommerceApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace eCommerceApp.Infrastructure.Repositories.Authentication
 {
@@ -12,6 +14,23 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
         private readonly UserManager<AppUser> _userManager = userManager;
         private readonly IRoleManagement _roleManagement = roleManagement;
         private readonly AppDbContext _context = context;
+
+
+        public async Task<bool> CheckeByPhoneNumber(string phoneNumber) =>
+        
+            await _userManager.Users.AnyAsync(u => u.PhoneNumber == phoneNumber); 
+        
+
+        public async Task<bool> CheckeByUserName(string userName) =>
+
+            await _userManager.Users.AnyAsync(u => u.UserName == userName);
+
+        public async Task<AppUser?> GetUserByEmailOrUserName(string emailORusername)=>
+
+             await _userManager.Users
+                .SingleOrDefaultAsync(u => u.Email == emailORusername || u.UserName == emailORusername);
+
+
 
         public async Task<bool> CreateUser(AppUser user)
         {
@@ -44,6 +63,7 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
                 new Claim("FullName" , user!.FullName) ,
                 new Claim (ClaimTypes.NameIdentifier , user.Id) ,
                 new Claim (ClaimTypes.Email , user.Email!) ,
+                new Claim (JwtRegisteredClaimNames.PreferredUsername , user.UserName!) ,
                 new Claim(ClaimTypes.Role, roleName!)
                 ];
            return claims;
@@ -51,10 +71,11 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
 
         public async Task<bool> LoginUser(AppUser user)
         {
-            var userExists = await GetUserByEmail(user.Email!);
+            var userExists = await GetUserByEmailOrUserName(user.Email!);
+            
             if (userExists == null)  return false;
 
-            string? roleName = await _roleManagement.GetUserRole(user.Email!);
+            string? roleName = await _roleManagement.GetUserRole(userExists.Email!);
              if(string.IsNullOrEmpty(roleName)) return false; 
 
             return await _userManager.CheckPasswordAsync(userExists  ,user.PasswordHash!);

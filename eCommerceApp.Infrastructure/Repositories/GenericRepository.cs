@@ -14,10 +14,10 @@ namespace eCommerceApp.Infrastructure.Repositories
            return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
         }
 
-        public async Task<TEntity> GetByIdAsync(Guid id)
+        public async Task<TEntity?> GetByIdAsync(Guid id)
         {
              var result = await _context.Set<TEntity>().FindAsync(id);
-            return result!;
+            return result;
             
         }
 

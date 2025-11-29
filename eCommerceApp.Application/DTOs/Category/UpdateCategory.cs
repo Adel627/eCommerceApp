@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace eCommerceApp.Application.DTOs.Category
 {
@@ -6,6 +7,8 @@ namespace eCommerceApp.Application.DTOs.Category
     {
         [Required]
         public Guid Id { get; set; }
+        [Required]
+        public IFormFile Image { get; set; } = default!;
 
     }
 

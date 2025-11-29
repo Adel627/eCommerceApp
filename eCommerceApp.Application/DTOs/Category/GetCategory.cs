@@ -9,6 +9,9 @@ namespace eCommerceApp.Application.DTOs.Category
     public class GetCategory:CategoryBase
     {
         public Guid Id { get; set; }
-        public ICollection<GetProduct>? products { get; set; } = [];
+        public string Image { get; set; } = default!;
+        public DateTime CreatedDate { get; set; } 
+        public DateTime? UpdatedDate { get; set; }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using eCommerceApp.Application.Services.Implementations;
+﻿using eCommerceApp.Application.Helpers;
+using eCommerceApp.Application.Services.Implementations;
 using eCommerceApp.Application.Services.Implementations.Authentication;
 using eCommerceApp.Application.Services.Implementations.Cart;
 using eCommerceApp.Application.Services.Interfaces;
@@ -36,6 +37,7 @@ namespace eCommerceApp.Application.DependencyInjection
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             services.AddScoped<ICartService , CartService>();
+            services.AddScoped<IImageService , ImageService>();
             return services;
         }
     }

@@ -12,7 +12,7 @@ using System.Text;
 
 namespace eCommerceApp.Infrastructure.Repositories.Authentication
 {
-    public class TokenManagement( AppDbContext context , IConfiguration config) : ITokenManagement
+    public class TokenManagement(AppDbContext context, IConfiguration config) : ITokenManagement
     {
         private readonly AppDbContext _context = context;
         private readonly IConfiguration _config = config;
@@ -38,7 +38,7 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
                 claims: claims,
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
                        );
-            return new JwtSecurityTokenHandler().WriteToken(token); 
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public string GetRefreshToken()
@@ -59,29 +59,35 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(token);
             if (jwtToken == null) return [];
-           return jwtToken.Claims.ToList();
+            return jwtToken.Claims.ToList();
         }
 
-        public async Task<string> GetUserIdByRefreshToken(string refreshToken) =>
-         (await  _context.RefreshTokens.FirstOrDefaultAsync( r => r.Token ==  refreshToken))!.UserId;
-      
-
-        public async Task<int> UpdateRefreshToken(string userId,string oldRefreshToken , string refreshToken)
+        public Task<string> GetUserIdByRefreshToken(string refreshToken)
         {
-           var userToken = 
-                await _context.RefreshTokens.FirstOrDefaultAsync( r => r.UserId == userId && r.Token == oldRefreshToken);  
-           if(userToken == null) return -1;
+            throw new NotImplementedException();
+        }
 
-            userToken.Token = refreshToken;
+        //public async Task<string> GetUserIdByRefreshToken(string refreshToken) =>
+        // (await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token == refreshToken))!.UserId;
+
+
+        public async Task<int> UpdateRefreshToken(string userId, string oldRefreshToken, string refreshToken)
+        {
+            //var userToken =
+            //     await _context.RefreshTokens.FirstOrDefaultAsync(r => r.UserId == userId && r.Token == oldRefreshToken);
+            //if (userToken == null) return -1;
+
+            //userToken.Token = refreshToken;
             return await _context.SaveChangesAsync();
         }
 
         public async Task<bool> ValidateRefreshToken(string refreshToken)
         {
-            var userRefreshToken =
-                await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token.Equals(refreshToken));
+            //var userRefreshToken =
+            //    await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token.Equals(refreshToken));
 
-            return userRefreshToken != null;
+            //return userRefreshToken != null;
+            return true;
         }
     }
 }

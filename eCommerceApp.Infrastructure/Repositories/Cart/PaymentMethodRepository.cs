@@ -12,8 +12,13 @@ namespace eCommerceApp.Infrastructure.Repositories.Cart
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<IEnumerable<PaymentMethod>> GetPaymentMethodsAsync() =>
-          await  _context.PaymentMethods.AsNoTracking().ToListAsync();
-        
+        public Task<IEnumerable<PaymentMethod>> GetPaymentMethodsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        //public async Task<IEnumerable<PaymentMethod>> GetPaymentMethodsAsync() =>
+        //  await _context.PaymentMethods.AsNoTracking().ToListAsync();
+
     }
 }

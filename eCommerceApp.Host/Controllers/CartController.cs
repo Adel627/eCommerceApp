@@ -1,6 +1,6 @@
 ﻿using eCommerceApp.Application.DTOs.Cart;
 using eCommerceApp.Application.Services.Interfaces.Cart;
-using eCommerceApp.Infrastructure.Consts;
+using eCommerceApp.Application.Consts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

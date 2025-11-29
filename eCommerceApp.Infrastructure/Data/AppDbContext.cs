@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace eCommerceApp.Infrastructure.Data
@@ -14,14 +15,23 @@ namespace eCommerceApp.Infrastructure.Data
         public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
         {
         }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<PaymentMethod> PaymentMethods { get; set; }
-        public DbSet<Achieve> CheckoutAchieves { get; set; }
+      
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
         }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<ProductCategories> ProductCategories { get; set; }
+        public DbSet<ProductImage> images { get; set; }
+        public DbSet<Rates> Rates { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+
+
+        //public DbSet<PaymentMethod> PaymentMethods { get; set; }
+        //public DbSet<Achieve> CheckoutAchieves { get; set; }
     }
 }

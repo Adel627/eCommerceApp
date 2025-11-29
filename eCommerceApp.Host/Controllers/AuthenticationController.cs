@@ -14,6 +14,7 @@ namespace eCommerceApp.Host.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateUser(CreateUser user)
         {
+            //Save Image
             var result = await _authenticationService.CreateUser(user);
             return result.Success ? Ok(result) : BadRequest(result);
         }

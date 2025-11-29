@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace eCommerceApp.Infrastructure.Consts
+namespace eCommerceApp.Application.Consts
 {
     public static class Roles
     {

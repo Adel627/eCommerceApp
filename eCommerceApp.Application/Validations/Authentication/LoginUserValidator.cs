@@ -8,8 +8,8 @@ namespace eCommerceApp.Application.Validations.Authentication
         public LoginUserValidator()
         {
 
-            RuleFor(x => x.Email)
-                .EmailAddress().WithMessage("Invalid email format.");
+            RuleFor(x => x.EmailorUserName)
+                .NotEmpty().WithMessage("Email or UserName is required");
 
             RuleFor(x => x.Password)
               .NotEmpty().WithMessage("Password is required");

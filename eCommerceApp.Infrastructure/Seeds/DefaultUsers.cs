@@ -15,8 +15,11 @@ namespace eCommerceApp.Infrastructure.Seeds
             {
                 FullName = "admin",
                 Email = "admin1@gmail.com",
-                UserName = "admin1@gmail.com",
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                UserName = "Admin1",
+                Adress = "Kafr El zayat",
+                PhoneNumber = "01120443011"
+                
             };
             if(!await userManager.Users.AnyAsync())
             {

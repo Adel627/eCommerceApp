@@ -37,8 +37,7 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
             }).UseExceptionProcessor() ,  //To Enable make exceptions of Db (Convert exceptions of DB to Known Exceptions)
             ServiceLifetime.Scoped );
 
-            Services.AddScoped<IGeneric<Product>, GenericRepository<Product>>();
-            Services.AddScoped<IGeneric<Category>, GenericRepository<Category>>();
+           
             Services.AddScoped(typeof(IAppLogger<>), typeof(SerilogLoggerAdapter<>));
             Services.AddScoped<IRoleManagement , RoleManagement>();
             Services.AddScoped<IUserManagement , UserManagement>();
@@ -46,7 +45,10 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
             Services.AddScoped<IPaymentMethod , PaymentMethodRepository>();
             Services.AddScoped<IPaymentService , StripePaymentService>();
             Services.AddScoped<ICart , CartRepository>();
+
             Services.AddScoped<ICategoryRepository , CategoryRepository>();
+            Services.AddScoped<IProductRepository , ProductRepository>();
+
 
             //Stripe configurations
 
