@@ -14,5 +14,6 @@ namespace eCommerceApp.Domain.Entities
         public ICollection<ProductImage> Images { get; set; } = default!;
         public ICollection<ProductCategories> Categories { get; set; } = default!;
         public ICollection<Rates> Rates { get; set; }=default!;
+        public ICollection<Comment> Comments { get; set; }= default!;
     }
 }

@@ -1,11 +1,9 @@
 ﻿using eCommerceApp.Application.Helpers;
 using eCommerceApp.Application.Services.Implementations;
 using eCommerceApp.Application.Services.Implementations.Authentication;
-using eCommerceApp.Application.Services.Implementations.Cart;
 using eCommerceApp.Application.Services.Interfaces;
 using eCommerceApp.Application.Services.Interfaces.Authentication;
 using eCommerceApp.Application.Services.Interfaces.Cart;
-using eCommerceApp.Domain.Interfaces.Cart;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Mapster;
@@ -34,9 +32,11 @@ namespace eCommerceApp.Application.DependencyInjection
             
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            services.AddScoped<IReviewService, ReviewService>();    
             services.AddScoped<ICartService , CartService>();
+
+
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IImageService , ImageService>();
             return services;
         }

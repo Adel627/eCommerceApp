@@ -1,0 +1,53 @@
+﻿using eCommerceApp.Application.DTOs.Review;
+using eCommerceApp.Application.Services.Interfaces;
+using eCommerceApp.Host.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace eCommerceApp.Host.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ReviewController(IReviewService reviewService) : ControllerBase
+    {
+        private readonly IReviewService _reviewService = reviewService;
+
+
+        [HttpPost("rate")]
+        public async Task<IActionResult> Rate(RateRequest request)
+        {
+          var result =  await _reviewService.RateProduct(request , User.GetUserId()!);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+
+        [HttpDelete("delete-rate/{RateId}")]
+        public async Task<IActionResult> DeleteRate(Guid RateId)
+        {
+            var result = await _reviewService.DeleteRate(RateId);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+
+
+        [HttpPost("add-comment")]
+        public async Task<IActionResult> AddComment(CommentRequest request)
+        {
+            var result = await _reviewService.AddComment(request, User.GetUserId()!);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+
+
+        [HttpPut("update-comment")]
+        public async Task<IActionResult> UpdateComment(UpdateCommentRequest request)
+        {
+            var result = await _reviewService.UpdateComment(request);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+
+        [HttpDelete("delete-comment/{commentId}")]
+        public async Task<IActionResult> DeleteComment(Guid commentId)
+        {
+            var result = await _reviewService.DeleteComment(commentId);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+    }
+}

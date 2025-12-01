@@ -1,5 +1,4 @@
 ﻿using eCommerceApp.Domain.Entities;
-using eCommerceApp.Domain.Entities.Cart;
 using eCommerceApp.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +26,9 @@ namespace eCommerceApp.Infrastructure.Data
         public DbSet<ProductImage> images { get; set; }
         public DbSet<Rates> Rates { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItems> CartItems { get; set; }
+
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 

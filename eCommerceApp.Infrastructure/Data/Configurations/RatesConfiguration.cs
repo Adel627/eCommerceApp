@@ -7,11 +7,11 @@ using System.Text;
 
 namespace eCommerceApp.Infrastructure.Data.Configurations
 {
-    public class CommentConfiguration : IEntityTypeConfiguration<Comment>
+    public class RatesConfiguration : IEntityTypeConfiguration<Rates>
     {
-        public void Configure(EntityTypeBuilder<Comment> builder)
+        public void Configure(EntityTypeBuilder<Rates> builder)
         {
-            builder.HasKey(c => new { c.RatesId, c.Content });
+            builder.HasIndex(r => new { r.UserId, r.ProductId }).IsUnique();
         }
     }
 }

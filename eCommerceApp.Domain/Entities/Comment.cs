@@ -7,8 +7,14 @@ namespace eCommerceApp.Domain.Entities
 {
     public class Comment
     {
-        public Rates Rates { get; set; } = default!;
-        public Guid RatesId { get; set; }
+        public Guid Id { get; set; }
+        public AppUser User { get; set; } = default!;
+        public string UserId { get; set; } = default!;
+        public Product Product { get; set; } = default!;
+        public Guid ProductId { get; set; }
         public string Content { get; set; } = default!;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedDate { get; set; }
+        
     }
 }

@@ -1,9 +1,7 @@
-﻿using eCommerceApp.Application.DTOs.Cart;
-using eCommerceApp.Application.Services.Interfaces.Cart;
-using eCommerceApp.Application.Consts;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using eCommerceApp.Application.Services.Interfaces;
+using eCommerceApp.Application.DTOs.Cart;
+using eCommerceApp.Host.Extensions;
 
 namespace eCommerceApp.Host.Controllers
 {
@@ -13,34 +11,35 @@ namespace eCommerceApp.Host.Controllers
     {
         private readonly ICartService _cartService = cartService;
 
-        [Authorize(Roles = Roles.User)]
-        [HttpPost("checkout")]
-        public async Task<IActionResult> Checkout(Checkout checkout)
+        [HttpPost("add")]
+        public async Task<IActionResult> AddToCart(ProcessCart request)
         {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = await _cartService.Checkout(checkout);
-            return result.Success ? Ok(result) : BadRequest(result);
+            var result = await _cartService.AddToCart(request , User.GetUserId()!);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
-        [Authorize(Roles = Roles.User)]
-        [HttpPost("save-checkout")]
-        public async Task<IActionResult> SaveCheckout(IEnumerable<CreateAchieve> achieves)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            var result = await _cartService.SaveCheckoutHistory(achieves);
-            return result.Success ? Ok(result) : BadRequest(result);
+        [HttpGet("items")]
+        public async Task<IActionResult> Get()
+        {
+            var result = await _cartService.GetCartItems( User.GetUserId()!);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPost("get-achieves")]
-        public async Task<IActionResult> GetAllCheckoutHistory()
+        [HttpPost("items/update")]
+        public async Task<IActionResult> Update(ProcessCart request)
         {
-            var result = await _cartService.GetAchievesAsync();
-            return result.Any() ? Ok(result) : BadRequest(result);
+            var result = await _cartService.UpdateQuantity(request, User.GetUserId()!);
+            return result.Success ? Ok(result) : NotFound(result);
         }
+
+
+        [HttpDelete("items/{CartItemId}")]
+        public async Task<IActionResult> Delete(Guid CartItemId)
+        {
+            var result = await _cartService.RemoveFromCart(CartItemId);
+            return result.Success ? NoContent() : NotFound(result);
+        }
+
     }
 }
