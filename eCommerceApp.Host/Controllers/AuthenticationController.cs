@@ -11,10 +11,12 @@ namespace eCommerceApp.Host.Controllers
     {
         private readonly IAuthenticationService _authenticationService = authenticationService;
 
+        
+
         [HttpPost("create")]
-        public async Task<IActionResult> CreateUser(CreateUser user)
+        public async Task<IActionResult> CreateUser([FromForm] CreateUser user)
         {
-            //Save Image
+            
             var result = await _authenticationService.CreateUser(user);
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -29,10 +31,17 @@ namespace eCommerceApp.Host.Controllers
 
 
 
-        [HttpPost("refreshToken")]
+        [HttpPost("refresh")]
         public async Task<IActionResult> ReviveToken([FromBody] string refreshToken)
         {
             var result = await _authenticationService.ReviveToken(refreshToken);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpPost("revoke-refresh-token")]
+        public async Task<IActionResult> RevokeRefreshToken([FromBody] string refreshToken)
+        {
+            var result = await _authenticationService.RevokeRefreshToken(refreshToken);
             return result.Success ? Ok(result) : BadRequest(result);
         }
     }

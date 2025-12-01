@@ -62,32 +62,35 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
             return jwtToken.Claims.ToList();
         }
 
-        public Task<string> GetUserIdByRefreshToken(string refreshToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        //public async Task<string> GetUserIdByRefreshToken(string refreshToken) =>
-        // (await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token == refreshToken))!.UserId;
+        public async Task<string> GetUserIdByRefreshToken(string refreshToken) =>
+         (await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token == refreshToken))!.UserId;
 
 
         public async Task<int> UpdateRefreshToken(string userId, string oldRefreshToken, string refreshToken)
         {
-            //var userToken =
-            //     await _context.RefreshTokens.FirstOrDefaultAsync(r => r.UserId == userId && r.Token == oldRefreshToken);
-            //if (userToken == null) return -1;
+            var userToken =
+                 await _context.RefreshTokens.FirstOrDefaultAsync(r => r.UserId == userId && r.Token == oldRefreshToken);
+            if (userToken == null) return -1;
 
-            //userToken.Token = refreshToken;
+            userToken.Token = refreshToken;
             return await _context.SaveChangesAsync();
         }
 
         public async Task<bool> ValidateRefreshToken(string refreshToken)
         {
-            //var userRefreshToken =
-            //    await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token.Equals(refreshToken));
+            var userRefreshToken =
+                await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token.Equals(refreshToken));
 
-            //return userRefreshToken != null;
-            return true;
+            return userRefreshToken != null;
+            
+        }
+        public async Task RevokeRefreshTokenAsync(string refreshToken)
+        {
+            RefreshToken? refreshTokenEntity = await _context.RefreshTokens
+                .FirstOrDefaultAsync( r => r.Token == refreshToken);
+
+             _context.RefreshTokens.Remove(refreshTokenEntity!);
+            await _context.SaveChangesAsync();
         }
     }
 }

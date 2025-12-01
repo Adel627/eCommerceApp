@@ -91,6 +91,26 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
                     ClockSkew = TimeSpan.Zero,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]!))
                 };
+                // if there any proplem in token and you want to debug to know the reason
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = ctx =>
+                    {
+                        Console.WriteLine("Auth header: " + ctx.Request.Headers["Authorization"].ToString());
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = ctx =>
+                    {
+                        Console.WriteLine("Auth failed: " + ctx.Exception?.Message);
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = ctx =>
+                    {
+                        Console.WriteLine("Token validated for: " + ctx.Principal?.Identity?.Name);
+                        return Task.CompletedTask;
+                    }
+                };
+
             });
             return Services;
         }

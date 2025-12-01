@@ -1,4 +1,5 @@
-﻿using eCommerceApp.Domain.Entities.Identity;
+﻿using eCommerceApp.Application.Consts;
+using eCommerceApp.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,14 +18,14 @@ namespace eCommerceApp.Infrastructure.Seeds
                 Email = "admin1@gmail.com",
                 EmailConfirmed = true,
                 UserName = "Admin1",
-                Adress = "Kafr El zayat",
+                Address = "Kafr El zayat",
                 PhoneNumber = "01120443011"
                 
             };
             if(!await userManager.Users.AnyAsync())
             {
                 await userManager.CreateAsync(Admin , "Admin1@@@#");
-                await userManager.AddToRoleAsync(Admin, "Admin");
+                await userManager.AddToRoleAsync(Admin, Roles.Admin);
             }
         }
     }

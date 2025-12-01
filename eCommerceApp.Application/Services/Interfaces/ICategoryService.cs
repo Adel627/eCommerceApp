@@ -10,10 +10,10 @@ namespace eCommerceApp.Application.Services.Interfaces
         Task<IEnumerable<GetCategoryDetails>> GetAllAsync();
         Task<GetCategoryDetails> GetByIdAsync(Guid id);
         Task<GetCategory> GetCurrentByIdAsync(Guid id);
-        //Task<IEnumerable<GetProduct>> GetCategoryWithProductsAsync(Guid categoryId);
+        Task<IEnumerable<GetProduct>> GetProductsByCategoryAsync(Guid categoryId);
         Task<IEnumerable<GetCategory>> GetCurrentAsync();
 
-        Task<ServiceResponse> AddAsync(CreateCategory Category);
+        Task<ServiceResponse> AddAsync(CreateCategory Category , string? UserId =null);
         Task<ServiceResponse> UpdateAsync(UpdateCategory Category);
         Task<ServiceResponse> DeleteAsync(Guid id);
 

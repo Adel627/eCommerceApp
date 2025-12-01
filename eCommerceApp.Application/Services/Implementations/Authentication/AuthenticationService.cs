@@ -1,6 +1,7 @@
 ﻿using eCommerceApp.Application.Consts;
 using eCommerceApp.Application.DTOs;
 using eCommerceApp.Application.DTOs.Authentication;
+using eCommerceApp.Application.Helpers;
 using eCommerceApp.Application.Services.Interfaces.Authentication;
 using eCommerceApp.Application.Services.Interfaces.Logging;
 using eCommerceApp.Domain.Entities.Identity;
@@ -14,12 +15,13 @@ namespace eCommerceApp.Application.Services.Implementations.Authentication
 {
     public class AuthenticationService (IUserManagement userManagement ,
         ITokenManagement tokenManagement , IRoleManagement roleManagement , IMapper mapper
-         , IAppLogger<AuthenticationService> logger): IAuthenticationService
+        ,IImageService imageService , IAppLogger<AuthenticationService> logger): IAuthenticationService
     {
         private readonly IUserManagement _userManagement = userManagement;
         private readonly ITokenManagement _tokenManagement = tokenManagement;
         private readonly IRoleManagement _roleManagement = roleManagement;
         private readonly IMapper _mapper = mapper;
+        private readonly IImageService _imageService = imageService;
         private readonly IAppLogger<AuthenticationService> _logger = logger;
 
         public async Task<ServiceResponse> CreateUser(CreateUser user)
@@ -29,15 +31,28 @@ namespace eCommerceApp.Application.Services.Implementations.Authentication
 
             if(await _userManagement.CheckeByPhoneNumber(user.PhoneNumber))
                 return new ServiceResponse(false, "Already user found with this phoneNumber. ");
-
-
+           
+          
             var mappedData = _mapper.Map<AppUser>(user);
             mappedData.PasswordHash = user.Password;
+            //Save Image
+            if (user.Picture != null)
+            {
+                var imageName = $"{Guid.NewGuid()}{Path.GetExtension(user.Picture.FileName)}";
+                var imageSaveResult = await _imageService.UploadImage(user.Picture, imageName, "Images/Users");
+                if (!imageSaveResult.upload)
+                    return new ServiceResponse(false, imageSaveResult.errorMessage!);
+                mappedData.Picture = Path.Combine("Images/Users" , imageName);
+            }
 
-           var result = await _userManagement.CreateUser(mappedData);
-            if (!result) 
+            var result = await _userManagement.CreateUser(mappedData);
+            if (!result)
+            {
+                 _imageService.Delete(mappedData.Picture!);
                 return new ServiceResponse(false, "Already user found with this email. ");
-         
+
+            }
+
             var IsAdded = await _roleManagement.AddUserToRole(mappedData, Roles.User);
             if (IsAdded) 
                 return new ServiceResponse(true, "User Created");
@@ -90,6 +105,17 @@ namespace eCommerceApp.Application.Services.Implementations.Authentication
                  new LoginResponse(Message: "Invalid token")
                 :new LoginResponse(Success: true, Token: jwtToken, RefreshToken: newRefreshToken);
                  
+
+        }
+        public async Task<LoginResponse> RevokeRefreshToken(string refreshToken)
+        {
+            bool valid = await _tokenManagement.ValidateRefreshToken(refreshToken);
+            if (!valid)
+                return new LoginResponse(Message: "Invalid token");
+
+            await _tokenManagement.RevokeRefreshTokenAsync(refreshToken);
+
+            return new LoginResponse(true, Message: "Token Revoked");
 
         }
     }

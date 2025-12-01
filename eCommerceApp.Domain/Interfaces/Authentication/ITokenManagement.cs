@@ -11,6 +11,8 @@ namespace eCommerceApp.Domain.Interfaces.Authentication
         Task<int> AddRefreshToken(string userId, string refreshToken);
         Task<int> UpdateRefreshToken(string userId, string oldRefreshToken, string refreshToken);
         string GenerateToken(List<Claim> claims);
+        Task RevokeRefreshTokenAsync(string refreshToken);
+
 
     }
 }

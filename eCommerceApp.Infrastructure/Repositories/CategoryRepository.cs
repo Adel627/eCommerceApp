@@ -18,9 +18,14 @@ namespace eCommerceApp.Infrastructure.Repositories
         public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(Guid categoryId)
         {
             var products = await _context.Products
-                //.Include(p => p.Category)
-               // .Where(p => p.CategoryId == categoryId)
-                .AsNoTracking().ToListAsync();
+                .Where(p => p.IsDeleted == false
+                && p.Categories.Any(c => c.CategoryId == categoryId && c.Category.IsDeleted == false))
+                .Include(p => p.Images)
+                .Include(p => p.Categories)
+                .ThenInclude(c => c.Category)
+                .ToListAsync();
+                
+
             return products.Any() ? products : [];
         }
 

@@ -7,7 +7,9 @@ namespace eCommerceApp.Domain.Interfaces
 {
     public interface IProductRepository : IGeneric<Product>
     {
-        Task<IEnumerable<Product>> GetAllNowAsync();
+        Task<IEnumerable<Product>> GetAllCurrentAsync();
         Task<int> ToggleDelete(Guid id);
+        Task<Product?> GetCurrentByIdAsync(Guid id);
+        
     }
 }

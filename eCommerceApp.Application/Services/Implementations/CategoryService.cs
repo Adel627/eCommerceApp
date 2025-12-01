@@ -15,7 +15,7 @@ namespace eCommerceApp.Application.Services.Implementations
         private readonly IMapper _mapper = mapper;
         private readonly IImageService _imageService = imageService;
 
-        public async Task<ServiceResponse> AddAsync(CreateCategory Category)
+        public async Task<ServiceResponse> AddAsync(CreateCategory Category , string? UserId)
         {
             var imageName = $"{Guid.NewGuid()}{Path.GetExtension(Category.Image.FileName)}";
             var imageUploadedResult = await _imageService.UploadImage(Category.Image, imageName, "Images/Category");
@@ -25,6 +25,7 @@ namespace eCommerceApp.Application.Services.Implementations
 
             var mappedData = _mapper.Map<Category>(Category);
             mappedData.Image = $"Images/Category/{imageName}";
+            mappedData.CreatedById = UserId;
 
             int result = await _categoryRepository.AddAsync(mappedData);
             return result > 0 ? new ServiceResponse(true, "Category added!")
@@ -72,16 +73,16 @@ namespace eCommerceApp.Application.Services.Implementations
             return _mapper.Map<GetCategory>(Category);
         }
 
-        //public async Task<IEnumerable<GetProduct>> GetCategoryWithProductsAsync(Guid categoryId)
-        //{
-        //    var products =
-        //        await _categoryRepository.GetCategoryWithProductsAsync(categoryId);
+        public async Task<IEnumerable<GetProduct>> GetProductsByCategoryAsync(Guid categoryId)
+        {
+            var products =
+                await _categoryRepository.GetProductsByCategoryAsync(categoryId);
 
-        //    if (!products.Any())  return [];
+            if (!products.Any()) return [];
 
-        //    return _mapper.Map<IEnumerable<GetProduct>>(products);
+            return _mapper.Map<IEnumerable<GetProduct>>(products);
 
-        //}
+        }
 
         public async Task<ServiceResponse> UpdateAsync(UpdateCategory CategoryDto)
         {

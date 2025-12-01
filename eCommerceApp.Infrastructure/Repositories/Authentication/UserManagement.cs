@@ -30,8 +30,6 @@ namespace eCommerceApp.Infrastructure.Repositories.Authentication
              await _userManager.Users
                 .SingleOrDefaultAsync(u => u.Email == emailORusername || u.UserName == emailORusername);
 
-
-
         public async Task<bool> CreateUser(AppUser user)
         {
             var userExsits = await GetUserByEmail(user.Email!);

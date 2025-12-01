@@ -17,7 +17,7 @@ namespace eCommerceApp.Application.DTOs.Authentication
         [Required]
         public string PhoneNumber { get; set; } = string.Empty;
         [Required]
-        public string Adress { get; set; } = default!;
+        public string Address { get; set; } = default!;
         public IFormFile? Picture { get; set; }
         [Required]
         public  string Password { get; set; } = string.Empty;

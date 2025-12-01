@@ -51,25 +51,25 @@ namespace eCommerceApp.Host.Controllers
 
         }
 
-        //[HttpGet("products-by-category/{categoryId}")]
-        //public async Task<IActionResult> GetProductsByCategory(Guid categoryId)
-        //{
-        //    var Category = 
-        //        await _categoryService.GetProductsByCategoryAsync(categoryId);
-        //    return Category.Any() ?  Ok(Category) : NotFound(Category);
-        //}
+        [HttpGet("products-by-category/{categoryId}")]
+        public async Task<IActionResult> GetProductsByCategory(Guid categoryId)
+        {
+            var Category =
+                await _categoryService.GetProductsByCategoryAsync(categoryId);
+            return Category.Any() ? Ok(Category) : NotFound(Category);
+        }
 
-        [Authorize(Roles = Roles.Admin)]
+        //[Authorize(Roles = Roles.Admin)]
         [HttpPost("add")]
         public async Task<IActionResult> Add([FromForm] CreateCategory model)
         {
 
             if(!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _categoryService.AddAsync(model);
+            var result = await _categoryService.AddAsync(model , null!);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        [Authorize(Roles = Roles.Admin)]
+        //[Authorize(Roles = Roles.Admin)]
         [HttpPut("update")]
         public async Task<IActionResult> Update(UpdateCategory model)
         {
@@ -78,7 +78,7 @@ namespace eCommerceApp.Host.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        [Authorize(Roles = Roles.Admin)]
+     //   [Authorize(Roles = Roles.Admin)]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

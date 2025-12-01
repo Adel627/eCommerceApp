@@ -60,8 +60,8 @@ namespace eCommerceApp.Host
                 app.UseStaticFiles();
                 app.UseHttpsRedirection();
 
+                app.UseAuthentication();
                 app.UseAuthorization();
-
                 //Add Seeding
                 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
                 using var scope = scopeFactory.CreateScope();
