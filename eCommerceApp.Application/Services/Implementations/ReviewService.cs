@@ -50,6 +50,14 @@ namespace eCommerceApp.Application.Services.Implementations
             return new ServiceResponse(true, "Rate Deleted!!");
 
         }
+        public async Task<IEnumerable<RateResponse>> GetAllRatesAsync(string UserId)
+        {
+            var rates = await _rateRepository.GetByUserId(UserId);
+
+            return !rates.Any() ? []
+                : _mapper.Map<IEnumerable<RateResponse>>(rates);
+        }
+
         public async Task<ServiceResponse> AddComment(CommentRequest request, string UserId)
         {
 
@@ -63,6 +71,13 @@ namespace eCommerceApp.Application.Services.Implementations
             await _commentRepository.AddAsync(comment);
             return new ServiceResponse(true, "Comment Saved");
 
+        }
+        public async Task<IEnumerable<CommentResponse>> GetAllCommentsAsync(string UserId)
+        {
+            var comments = await _commentRepository.GetByUserId(UserId);
+
+            return !comments.Any() ? []
+                : _mapper.Map<IEnumerable<CommentResponse>>(comments);
         }
         public async Task<ServiceResponse> UpdateComment(UpdateCommentRequest request)
         {
@@ -87,5 +102,7 @@ namespace eCommerceApp.Application.Services.Implementations
             return new ServiceResponse(true, "Comment Deleted!!");
 
         }
+
+        
     }
 }

@@ -15,6 +15,7 @@ namespace eCommerceApp.Domain.Entities.Identity
         public ICollection<RefreshToken> RefreshTokens { get; set; } = default!;
         public ICollection<Rates> Rates { get; set; } = default!;
         public ICollection<Comment> Comments { get; set; } = default!;
+        public ICollection<Order> Orders { get; set; } = default!;
 
     }
 }

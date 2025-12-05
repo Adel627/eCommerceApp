@@ -23,7 +23,19 @@ namespace eCommerceApp.Infrastructure.Repositories
 
         public async Task<Cart?> GetCartWithSpecificItem(string UserId, Guid ProductId)=>
             await _context.Carts
-            .Include(c => c.CartItems.SingleOrDefault(c => c.ProductId == ProductId))
+            .Include(c => c.CartItems.Where(c => c.ProductId == ProductId))
             .SingleOrDefaultAsync(c => c.UserId == UserId);
+
+        public async Task<bool> Clear(Guid cartId)
+        {
+            var items = await _context.CartItems
+                .Where(c => c.CartId == cartId).ToListAsync();
+           
+            if(items.Count == 0) return false;
+
+             _context.RemoveRange(items);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

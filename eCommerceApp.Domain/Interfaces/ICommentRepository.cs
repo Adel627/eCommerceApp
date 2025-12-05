@@ -7,5 +7,7 @@ namespace eCommerceApp.Domain.Interfaces
 {
     public interface ICommentRepository : IGeneric<Comment> 
     {
+        Task<IEnumerable<Comment>> GetByUserId(string userId);
+
     }
 }

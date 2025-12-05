@@ -8,5 +8,6 @@ namespace eCommerceApp.Domain.Interfaces
     public interface IRateRepository : IGeneric<Rates>
     {
         Task<Rates?> GetByUserIdandProductId(string userId , Guid productId);
+        Task<IEnumerable<Rates>> GetByUserId(string userId );
     }
 }

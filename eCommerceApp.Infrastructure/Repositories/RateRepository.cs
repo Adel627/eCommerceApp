@@ -16,6 +16,10 @@ namespace eCommerceApp.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<Rates>> GetByUserId(string userId) =>
+            await _context.Rates.Where(r => r.UserId == userId).ToListAsync();
+        
+
         public async Task<Rates?> GetByUserIdandProductId(string userId, Guid productId) =>
             await _context.Rates.SingleOrDefaultAsync(r => r.UserId == userId && r.ProductId == productId);
 

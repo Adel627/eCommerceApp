@@ -1,6 +1,7 @@
 ﻿using eCommerceApp.Domain.Entities;
 using eCommerceApp.Domain.Interfaces;
 using eCommerceApp.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,5 +15,8 @@ namespace eCommerceApp.Infrastructure.Repositories
         {
             _context = context;
         }
+        public async Task<IEnumerable<Comment>> GetByUserId(string userId) =>
+           await _context.Comments.Where(r => r.UserId == userId).ToListAsync();
+
     }
 }

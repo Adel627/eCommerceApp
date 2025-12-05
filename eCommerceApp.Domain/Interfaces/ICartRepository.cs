@@ -8,6 +8,7 @@ namespace eCommerceApp.Domain.Interfaces
         Task<Cart?> GetByUserId(string userId);
         Task<Cart?> GetCartItems(string userId);
         Task<Cart?> GetCartWithSpecificItem(string UserId, Guid ProductId);
+        Task<bool> Clear(Guid cartId);
 
     }
 }

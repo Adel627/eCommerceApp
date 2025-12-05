@@ -26,27 +26,41 @@ namespace eCommerceApp.Application.Services.Implementations
             if (product == null)
                 return new ServiceResponse(false, "there are no products with the given Id");
 
-            if(request.Quantity > product.Quantity)
+            if (request.Quantity > product.Quantity)
                 return new ServiceResponse(false, "the quantity is grather than our stock");
 
-            var cart = await _cartRepository.GetByUserId(UserId);
+            var cart = await _cartRepository
+                .GetCartWithSpecificItem(UserId, request.ProductId); 
 
             if(cart == null)
             {
                 cart = new Cart() { UserId = UserId };
                 await _cartRepository.AddAsync(cart);
             }
-            cart.CartItems.Add(new CartItems()
+
+            if(cart.CartItems.Count > 0 )
             {
+                cart.CartItems.FirstOrDefault()!.Quantity += request.Quantity;
+                cart.CartItems.FirstOrDefault()!.LastUpdate = DateTime.UtcNow;
+  
+                cart.LastUpdate = DateTime.UtcNow;
+                await _cartRepository.UpdateAsync(cart);
+                return new ServiceResponse(true, "Product added");
+            }
+
+            var item= new CartItems() 
+            {   CartId = cart.Id,
                 ProductId = request.ProductId,
                 Quantity = request.Quantity
-            });
+            };
+
+            await _cartIemsRepository.AddAsync(item);
             cart.LastUpdate = DateTime.UtcNow;
             await _cartRepository.UpdateAsync(cart);
 
             return new ServiceResponse(true, "Product added to cart!!");
         }
-        public async Task<ServiceResponse<GetCartItems>> GetCartItems(string UserId)
+        public async Task<IEnumerable<GetCartItems>> GetCartItems(string UserId)
         {
             var cart= await _cartRepository.GetCartItems(UserId);
             if (cart == null)
@@ -54,15 +68,14 @@ namespace eCommerceApp.Application.Services.Implementations
                 cart = new Cart() { UserId = UserId };
                 await _cartRepository.AddAsync(cart);
 
-                return
-                    new ServiceResponse<GetCartItems>(false, "there are no items in this cart");
+                return [];
+                   
             }
+            var mappedData = _mapper.Map<IEnumerable<GetCartItems>>(cart.CartItems);
 
-            return cart.CartItems.Any()
-                ? new ServiceResponse<GetCartItems>(true, Value: _mapper.Map<GetCartItems>(cart.CartItems))
-                : new ServiceResponse<GetCartItems>(false, "there are no items in this cart");
-
-
+            return !cart.CartItems.Any()
+                ? []
+                : mappedData;
 
         }
         public async Task<ServiceResponse> RemoveFromCart(Guid CartItemId)
@@ -78,6 +91,12 @@ namespace eCommerceApp.Application.Services.Implementations
 
         public async Task<ServiceResponse> UpdateQuantity(ProcessCart request, string UserId)
         {
+            var product = await _productInterface.GetCurrentByIdAsync(request.ProductId);
+            if (product == null)
+                return new ServiceResponse(false, "there are no products with the given Id");
+
+            if (request.Quantity > product.Quantity)
+                return new ServiceResponse(false, "the quantity is grather than our stock");
             var cart = await _cartRepository.GetCartWithSpecificItem(UserId , request.ProductId);
 
             if (cart == null)
@@ -95,7 +114,25 @@ namespace eCommerceApp.Application.Services.Implementations
             cart.CartItems.FirstOrDefault()!.LastUpdate = DateTime.UtcNow;
             cart.LastUpdate = DateTime.UtcNow;  
               await _cartRepository.UpdateAsync(cart);
-                return new ServiceResponse(false, "there are no products with the given Id");
+                return new ServiceResponse(true, "Item Updated!!");
+
+        }
+        public async Task<ServiceResponse> Clear(string UserId)
+        {
+            var cart = await _cartRepository.GetByUserId(UserId);
+
+            if (cart == null)
+            {
+                cart = new Cart() { UserId = UserId };
+                await _cartRepository.AddAsync(cart);
+                return new ServiceResponse(false, "You do not have any products in cart");
+            }
+           bool result = await _cartRepository.Clear(cart.Id);
+
+            if(!result)
+                return new ServiceResponse(false, "You do not have any products in cart");
+
+            return new ServiceResponse(true, "Cart Cleared Successfully");
 
         }
     }
