@@ -11,6 +11,7 @@ namespace eCommerceApp.Domain.Entities
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime? LastUpdate { get; set; }
         public ICollection<CartItems> CartItems { get; set; } = default!;
+        public decimal GetTotal => CartItems.Sum( c => c.Product.Price * c.Quantity);
 
     }
 }

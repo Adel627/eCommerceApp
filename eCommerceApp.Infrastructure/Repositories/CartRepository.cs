@@ -19,6 +19,7 @@ namespace eCommerceApp.Infrastructure.Repositories
 
         public async Task<Cart?> GetCartItems(string userId) =>
             await _context.Carts.Include(c => c.CartItems)
+            .ThenInclude(c => c.Product)
             .SingleOrDefaultAsync(c => c.UserId == userId);
 
         public async Task<Cart?> GetCartWithSpecificItem(string UserId, Guid ProductId)=>

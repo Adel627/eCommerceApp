@@ -20,11 +20,11 @@ namespace eCommerceApp.Domain.Entities
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public AppUser User { get; set; } = default!;
         public string UserId { get; set; } = default!;
-        public ICollection<OrderItem> orderItems { get; set; } = default!;
+        public ICollection<OrderItem> orderItems { get; set; } = new List<OrderItem>();
         public Payment Payment { get; set; } = default!;    
 
     }

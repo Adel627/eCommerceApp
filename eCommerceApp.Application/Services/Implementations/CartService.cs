@@ -1,7 +1,6 @@
 ﻿using eCommerceApp.Application.DTOs;
 using eCommerceApp.Application.DTOs.Cart;
 using eCommerceApp.Application.Services.Interfaces;
-using eCommerceApp.Application.Services.Interfaces.Cart;
 using eCommerceApp.Domain.Entities;
 using eCommerceApp.Domain.Interfaces;
 using eCommerceApp.Domain.Interfaces.Authentication;

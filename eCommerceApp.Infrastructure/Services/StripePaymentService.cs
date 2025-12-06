@@ -1,6 +1,6 @@
 ﻿using eCommerceApp.Application.DTOs;
 using eCommerceApp.Application.DTOs.Cart;
-using eCommerceApp.Application.Services.Interfaces.Cart;
+using eCommerceApp.Application.Services.Interfaces;
 using eCommerceApp.Domain.Entities;
 using Stripe.Checkout;
 using System;
@@ -9,7 +9,7 @@ using System.Text;
 
 namespace eCommerceApp.Infrastructure.Services
 {
-    public class StripePaymentService : IPaymentService
+    public class StripePaymentService 
     {
         public async Task<ServiceResponse> Pay(decimal totalAmount, IEnumerable<Product> cartProducts,
             IEnumerable<ProcessCart> carts)

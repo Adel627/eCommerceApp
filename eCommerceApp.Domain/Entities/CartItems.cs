@@ -13,7 +13,7 @@ namespace eCommerceApp.Domain.Entities
         public Guid ProductId { get; set; } 
         public int Quantity { get; set; }
         public DateTime AddedToCartDate { get; set; } = DateTime.UtcNow;
-        public DateTime? LastUpdate {  get; set; } 
+        public DateTime? LastUpdate {  get; set; }
         
 
     }

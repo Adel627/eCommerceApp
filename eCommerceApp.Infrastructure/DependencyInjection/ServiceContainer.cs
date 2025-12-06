@@ -1,4 +1,4 @@
-﻿using eCommerceApp.Application.Services.Interfaces.Cart;
+﻿using eCommerceApp.Application.Services.Interfaces;
 using eCommerceApp.Application.Services.Interfaces.Logging;
 using eCommerceApp.Domain.Entities;
 using eCommerceApp.Domain.Entities.Identity;
@@ -40,7 +40,7 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
             Services.AddScoped<IRoleManagement , RoleManagement>();
             Services.AddScoped<IUserManagement , UserManagement>();
             Services.AddScoped<ITokenManagement , TokenManagement>();
-            Services.AddScoped<IPaymentService , StripePaymentService>();
+            
          
 
             Services.AddScoped<ICategoryRepository , CategoryRepository>();
@@ -49,6 +49,8 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
             Services.AddScoped<ICommentRepository, CommentRepository>();
             Services.AddScoped<ICartRepository, CartRepository>();
             Services.AddScoped<ICartIemsRepository, CartItemRepository>();
+            Services.AddScoped<IOrderRepository, OrderRepository>();
+            Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 
 
             //Stripe configurations
