@@ -3,6 +3,7 @@
 using eCommerceApp.Domain.Entities;
 using eCommerceApp.Domain.Interfaces;
 using eCommerceApp.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceApp.Infrastructure.Repositories
 {
@@ -13,5 +14,11 @@ namespace eCommerceApp.Infrastructure.Repositories
         {
             _context = context;
         }
+
+        public async Task<Order?> GetOrderWithItems(Guid orderId) =>
+            await _context.Orders
+            .Include(o => o.orderItems).ThenInclude( i => i.Product)
+            .ThenInclude(p => p.Images)
+            .SingleOrDefaultAsync(o => o.Id == orderId);
     }
 }

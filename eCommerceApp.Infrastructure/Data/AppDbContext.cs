@@ -31,6 +31,7 @@ namespace eCommerceApp.Infrastructure.Data
 
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems {  get; set; }
+        public DbSet<Payment> Payments { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 

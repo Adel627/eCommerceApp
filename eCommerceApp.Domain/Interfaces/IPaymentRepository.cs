@@ -5,8 +5,8 @@ using System.Text;
 
 namespace eCommerceApp.Domain.Interfaces
 {
-    public interface IOrderRepository : IGeneric<Order>
+    public interface IPaymentRepository : IGeneric<Payment>
     {
-        Task<Order?> GetOrderWithItems(Guid orderId);
+        Task<Payment?> GetPaymentWithOrder(string sessionId);
     }
 }

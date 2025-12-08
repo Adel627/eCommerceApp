@@ -18,10 +18,28 @@ namespace eCommerceApp.Host.Controllers
         [HttpPost("order")]
         public async Task<IActionResult> MakeOrder()
         {
-          
+
             var result = await _checkoutService.AddOrderAsync(User.GetUserId()!);
             return result.Success ? Ok(result.Value) : NotFound(result);
         }
-    
+
+
+        [HttpPost("pay/{orderId}")]
+        public async Task<IActionResult> Pay(Guid orderId)
+        {
+
+            var result = await _checkoutService.CreateCheckoutAsync(orderId);
+            return result.Success ? Ok(result.Value) : NotFound(result);
+        }
+
+
+        [HttpPost("confirm-pay/{sessionId}")]
+        public async Task<IActionResult> Confirm(string sessionId)
+        {
+
+            var result = await _checkoutService.ConfirmPay(sessionId);
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+
     }
 }

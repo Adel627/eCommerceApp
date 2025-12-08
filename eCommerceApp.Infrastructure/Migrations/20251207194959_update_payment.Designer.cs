@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eCommerceApp.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using eCommerceApp.Infrastructure.Data;
 namespace eCommerceApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251207194959_update_payment")]
+    partial class update_payment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -471,7 +474,8 @@ namespace eCommerceApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderId")
+                        .IsUnique();
 
                     b.ToTable("Payments");
                 });
@@ -727,8 +731,8 @@ namespace eCommerceApp.Infrastructure.Migrations
             modelBuilder.Entity("eCommerceApp.Domain.Entities.Payment", b =>
                 {
                     b.HasOne("eCommerceApp.Domain.Entities.Order", "Order")
-                        .WithMany("Payments")
-                        .HasForeignKey("OrderId")
+                        .WithOne("Payment")
+                        .HasForeignKey("eCommerceApp.Domain.Entities.Payment", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -819,7 +823,8 @@ namespace eCommerceApp.Infrastructure.Migrations
 
             modelBuilder.Entity("eCommerceApp.Domain.Entities.Order", b =>
                 {
-                    b.Navigation("Payments");
+                    b.Navigation("Payment")
+                        .IsRequired();
 
                     b.Navigation("orderItems");
                 });

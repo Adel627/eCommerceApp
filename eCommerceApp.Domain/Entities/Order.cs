@@ -25,7 +25,7 @@ namespace eCommerceApp.Domain.Entities
         public AppUser User { get; set; } = default!;
         public string UserId { get; set; } = default!;
         public ICollection<OrderItem> orderItems { get; set; } = new List<OrderItem>();
-        public Payment Payment { get; set; } = default!;    
+        public ICollection<Payment> Payments { get; set; } = default!;    
 
     }
 

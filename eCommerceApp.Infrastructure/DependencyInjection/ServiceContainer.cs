@@ -51,7 +51,8 @@ namespace eCommerceApp.Infrastructure.DependencyInjection
             Services.AddScoped<ICartIemsRepository, CartItemRepository>();
             Services.AddScoped<IOrderRepository, OrderRepository>();
             Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
-
+            Services.AddScoped<IStripePaymentService, StripePaymentService>();
+            Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
             //Stripe configurations
 

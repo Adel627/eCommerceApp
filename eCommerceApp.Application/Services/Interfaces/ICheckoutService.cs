@@ -10,5 +10,7 @@ namespace eCommerceApp.Application.Services.Interfaces
     {
         
         Task<ServiceResponse<GetOrder>> AddOrderAsync(string UserId);
+        Task<ServiceResponse<CheckoutResponse>> CreateCheckoutAsync(Guid orderId);
+        Task<ServiceResponse> ConfirmPay(string sessionId);
     }
 }
