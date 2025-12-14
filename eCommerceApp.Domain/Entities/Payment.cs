@@ -15,6 +15,7 @@ namespace eCommerceApp.Domain.Entities
         public string Currency { get; set; } = "USD";
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
         public string SessionId { get; set; } = string.Empty;
+        public string? PaymentIntentId { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 

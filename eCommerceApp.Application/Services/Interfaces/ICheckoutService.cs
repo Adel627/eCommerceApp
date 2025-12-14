@@ -11,6 +11,8 @@ namespace eCommerceApp.Application.Services.Interfaces
         
         Task<ServiceResponse<GetOrder>> AddOrderAsync(string UserId);
         Task<ServiceResponse<CheckoutResponse>> CreateCheckoutAsync(Guid orderId);
-        Task<ServiceResponse> ConfirmPay(string sessionId);
+         Task ConfirmPayWebhook(string paymentIntendId);
+        Task UpdatePayFailed(string paymentIntendId);
+       // Task<ServiceResponse> ConfirmPay(string sessionId);
     }
 }

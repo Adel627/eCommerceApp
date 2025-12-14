@@ -86,12 +86,14 @@ namespace eCommerceApp.Infrastructure.Services
 
             if (session == null)
                 return PaymentStatus.NotFound;
-
+            
             if (session.PaymentStatus == "paid")
                 return PaymentStatus.Paid;
 
             return PaymentStatus.Failed;
         }
+
+      
 
     }
 }

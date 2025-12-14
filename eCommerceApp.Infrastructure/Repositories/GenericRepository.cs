@@ -2,6 +2,7 @@
 using eCommerceApp.Infrastructure.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace eCommerceApp.Infrastructure.Repositories
 {
@@ -12,6 +13,33 @@ namespace eCommerceApp.Infrastructure.Repositories
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
            return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] Includes)
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+
+            //apply include
+            foreach (var item in Includes)
+            {
+                query = query.Include(item);
+            }
+            return await query.ToListAsync();
+        }
+
+        public async Task<TEntity?> GetByIdAsync(Guid id, params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _context.Set<TEntity>();
+
+            // Apply includes
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            // Filter by Id
+            var entity = await query.FirstOrDefaultAsync(x => EF.Property<Guid>(x, "Id") == id);
+            return entity;
         }
 
         public async Task<TEntity?> GetByIdAsync(Guid id)
@@ -43,5 +71,7 @@ namespace eCommerceApp.Infrastructure.Repositories
             }
             return 0;
         }
+
+     
     }
 }

@@ -1,4 +1,5 @@
 ﻿using eCommerceApp.Domain.Entities;
+using eCommerceApp.Domain.Helpers;
 using eCommerceApp.Domain.Interfaces;
 using eCommerceApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,18 +15,35 @@ namespace eCommerceApp.Infrastructure.Repositories
             _context = context;
         }
 
-  
-        public async Task<IEnumerable<Product>> GetAllCurrentAsync()
+
+        public IQueryable GetAllCurrentAsync(RequestFilters filters)
         {
-            return await _context.Products.Include(p => p.Categories.Where(c => c.Category.IsDeleted == false))
+
+            var query = _context.Products.Where(p => p.IsDeleted == false);
+
+            if (!string.IsNullOrEmpty(filters.SearchValue))
+            {
+                query = query.Where(x => x.Name.Contains(filters.SearchValue));
+            }
+
+            if (filters.CategoryId.HasValue)
+                query = query.Where(m => m.Categories.Any(c => c.CategoryId == filters.CategoryId));
+
+            if (!string.IsNullOrEmpty(filters.SortColumn))
+            {
+                query = filters.SortColumn switch
+                {
+                    "PriceAce" => query.OrderBy(m => m.Price),
+                    "PriceDce" => query.OrderByDescending(m => m.Price),
+                    _ => query.OrderBy(m => m.Name),
+                };
+            }
+            var source = query.Include(p => p.Categories.Where(c => c.Category.IsDeleted == false))
                                           .ThenInclude(c => c.Category)
-                                          .Include(p => p.Images)
-                                          .AsNoTracking()
-                                          .Where(p => p.IsDeleted == false)
-                                          .ToListAsync();
-
-
-
+                                           .Include(p => p.Images);
+                                           
+              
+            return source;
         }
 
         public async Task<Product?> GetCurrentByIdAsync(Guid id)

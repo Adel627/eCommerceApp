@@ -18,5 +18,8 @@ namespace eCommerceApp.Infrastructure.Repositories
         public async Task<IEnumerable<Comment>> GetByUserId(string userId) =>
            await _context.Comments.Where(r => r.UserId == userId).ToListAsync();
 
+        public async Task<IEnumerable<Comment>> GetByProductId(Guid productId) =>
+            await _context.Comments.Where(r => r.ProductId == productId).ToListAsync();
+
     }
 }

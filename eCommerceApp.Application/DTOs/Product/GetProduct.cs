@@ -16,6 +16,7 @@ namespace eCommerceApp.Application.DTOs.Product
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
         public int Quantity { get; set; }
+        public double AverageRating { get; set; }
         public IList<string> CategoryNames {  get; set; }= new List<string>();
         public IList<string> Images {  get; set; }= new List<string>();
         public DateTime CreatedDate { get; set; } 

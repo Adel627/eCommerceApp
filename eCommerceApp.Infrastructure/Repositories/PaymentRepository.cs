@@ -16,6 +16,11 @@ namespace eCommerceApp.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<Payment?> GetPaymentByPaymentIntendId(string PaymentIntendId) =>
+           await _context.Payments
+            .Include(p => p.Order)
+            .SingleOrDefaultAsync(p => p.PaymentIntentId == PaymentIntendId );
+
         public async Task<Payment?> GetPaymentWithOrder(string sessionId) =>
             await _context.Payments
             .Include( p => p.Order)

@@ -59,17 +59,17 @@ namespace eCommerceApp.Host.Controllers
             return Category.Any() ? Ok(Category) : NotFound(Category);
         }
 
-        //[Authorize(Roles = Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost("add")]
         public async Task<IActionResult> Add([FromForm] CreateCategory model)
         {
 
             if(!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _categoryService.AddAsync(model , null!);
+            var result = await _categoryService.AddAsync(model ,User.GetUserId()!);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        //[Authorize(Roles = Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("update")]
         public async Task<IActionResult> Update(UpdateCategory model)
         {
@@ -78,7 +78,7 @@ namespace eCommerceApp.Host.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-     //   [Authorize(Roles = Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

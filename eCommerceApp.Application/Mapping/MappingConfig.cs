@@ -3,6 +3,7 @@ using eCommerceApp.Application.DTOs.Category;
 using eCommerceApp.Application.DTOs.Checkout;
 using eCommerceApp.Application.DTOs.Product;
 using eCommerceApp.Domain.Entities;
+using eCommerceApp.Domain.Helpers;
 using Mapster;
 
 
@@ -25,7 +26,13 @@ namespace eCommerceApp.Application.Mapping
                 .Map(dest => dest.Images, src => src.Images.Select(i => i.Image))
                   .Map(dest => dest.CategoryNames,
                 src => src.Categories.Select(c => c.Category.Name));
-            /*.Categories.Where(c => c.Category.IsDeleted == false)*//*.Select(*/
+
+            config.NewConfig<Product, GetProductDetails>()
+               .Map(dest => dest.Images, src => src.Images.Select(i => i.Image))
+                 .Map(dest => dest.CategoryIds,
+               src => src.Categories.Select(c => c.CategoryId));
+
+
 
             //Checkout
 

@@ -37,7 +37,7 @@ namespace eCommerceApp.Application.Services.Implementations
                 await _cartRepository.AddAsync(cart);
             }
 
-            if(cart.CartItems.Count > 0 )
+            if(cart?.CartItems?.Count > 0 )
             {
                 cart.CartItems.FirstOrDefault()!.Quantity += request.Quantity;
                 cart.CartItems.FirstOrDefault()!.LastUpdate = DateTime.UtcNow;

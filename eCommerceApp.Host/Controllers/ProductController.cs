@@ -1,4 +1,5 @@
 ﻿using eCommerceApp.Application.Consts;
+using eCommerceApp.Application.DTOs;
 using eCommerceApp.Application.DTOs.Category;
 using eCommerceApp.Application.DTOs.Product;
 using eCommerceApp.Application.Services.Implementations;
@@ -7,6 +8,8 @@ using eCommerceApp.Host.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using eCommerceApp.Domain.Helpers;
+
 
 namespace eCommerceApp.Host.Controllers
 {
@@ -18,7 +21,7 @@ namespace eCommerceApp.Host.Controllers
 
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] RequestFilters filters)
         {
 
             if (User.IsInRole(Roles.Admin))
@@ -27,8 +30,8 @@ namespace eCommerceApp.Host.Controllers
                 return Products.Any() ? Ok(Products) : NotFound(Products);
             }
 
-            var currentProducts = await _productService.GetAllCurrentAsync();
-            return currentProducts.Any() ? Ok(currentProducts) : NotFound(currentProducts);
+            var currentProducts = await _productService.GetAllCurrentAsync(filters);
+            return currentProducts.Items.Any() ? Ok(currentProducts) : NotFound(currentProducts);
         }
 
 
@@ -52,26 +55,26 @@ namespace eCommerceApp.Host.Controllers
         }
 
      
-      //  [Authorize(Roles = Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost("add")]
         public async Task<IActionResult> Add([FromForm] CreateProduct model)
         {
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _productService.AddAsync(model, null);
+            var result = await _productService.AddAsync(model, User.GetUserId()!);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        //[Authorize(Roles = Roles.Admin)]
-        //[HttpPut("update")]
-        //public async Task<IActionResult> Update(UpdateProduct model)
-        //{
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
-        //    var result = await _productService.UpdateAsync(model);
-        //    return result.Success ? Ok(result) : BadRequest(result);
-        //}
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPut("update")]
+        public async Task<IActionResult> Update(UpdateProduct model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var result = await _productService.UpdateAsync(model);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
 
-       // [Authorize(Roles = Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

@@ -15,7 +15,7 @@ namespace eCommerceApp.Application.Services.Implementations
         private readonly IMapper _mapper = mapper;
         private readonly IImageService _imageService = imageService;
 
-        public async Task<ServiceResponse> AddAsync(CreateCategory Category , string? UserId)
+        public async Task<ServiceResponse> AddAsync(CreateCategory Category , string UserId)
         {
             var imageName = $"{Guid.NewGuid()}{Path.GetExtension(Category.Image.FileName)}";
             var imageUploadedResult = await _imageService.UploadImage(Category.Image, imageName, "Images/Category");

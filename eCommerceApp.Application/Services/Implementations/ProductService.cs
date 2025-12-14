@@ -1,15 +1,12 @@
-﻿
-using eCommerceApp.Application.DTOs;
-using eCommerceApp.Application.DTOs.Category;
+﻿using eCommerceApp.Application.DTOs;
 using eCommerceApp.Application.DTOs.Product;
 using eCommerceApp.Application.Helpers;
 using eCommerceApp.Application.Services.Interfaces;
 using eCommerceApp.Domain.Entities;
+using eCommerceApp.Domain.Helpers;
 using eCommerceApp.Domain.Interfaces;
+using Mapster;
 using MapsterMapper;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eCommerceApp.Application.Services.Implementations
 {
@@ -61,22 +58,21 @@ namespace eCommerceApp.Application.Services.Implementations
 
         public async Task<IEnumerable<GetProductDetails>> GetAllAsync()
         {
-            var products = await _productRepository.GetAllAsync();
+            var products = await _productRepository.GetAllAsync(p => p.Categories , p => p.Images);
             if (!products.Any())
                 return [];
             var mappedData = _mapper.Map<IEnumerable<GetProductDetails>>(products);
             return mappedData;
 
         }
-        public async Task<IEnumerable<GetProduct>> GetAllCurrentAsync()
+        public async Task<PaginatedList<GetProduct>> GetAllCurrentAsync(RequestFilters requestFilters)
         {
-            var products = await _productRepository.GetAllCurrentAsync();
-            if (!products.Any())
-                return [];
+            var query =  _productRepository.GetAllCurrentAsync(requestFilters);
+            IQueryable<GetProduct> Query = query.ProjectToType< GetProduct>();
 
-            var mappedData = _mapper.Map<IEnumerable<GetProduct>>(products);
-            
-            return mappedData;
+            var products = await PaginatedList<GetProduct>.CreateAsync(Query, requestFilters.PageNumber, requestFilters.PageSize);
+
+            return products;
         }
         public async Task<GetProductDetails> GetByIdAsync(Guid id)
         {
@@ -94,40 +90,41 @@ namespace eCommerceApp.Application.Services.Implementations
             return _mapper.Map<GetProduct>(Category);
         }
 
-        //public async Task<ServiceResponse> UpdateAsync(UpdateProduct model) 
-        //{
-        //    var product = await _productRepository.GetCurrentByIdAsync(model.Id); 
-        //    if(product is null)
-        //        new ServiceResponse(false, "There are no product with the given Id");
+        public async Task<ServiceResponse> UpdateAsync(UpdateProduct model)
+        {
+            var product = await _productRepository.GetCurrentByIdAsync(model.Id);
 
-        //    foreach (var image in product!.Images)
-        //        _imageService.Delete(image.Image); ;
+            if (product is null)
+                new ServiceResponse(false, "There are no product with the given Id");
 
-        //    if (model.Categories?.Count > 0)
-        //    {
-        //        product!.Categories = new List<ProductCategories>();
-        //        foreach (var category in product.Categories)
-        //            product.Categories.Add(new ProductCategories() { CategoryId = category.CategoryId });
-        //    }
+            _mapper.Map(model , product);
 
-            
-            
-        //    product!.Images = new List<ProductImage>();
-        //    foreach (var image in product.Images)
-        //    {
-        //        var imageName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-        //        var imageUploadedResult = await _imageService.UploadImage(image, imageName, "Images/Product");
+            if (model.Categories?.Count > 0)
+            {
+                product!.Categories.Clear();
+                foreach (var category in model.Categories)
+                    product.Categories.Add(new ProductCategories() { CategoryId = category });
+            }
 
-        //        if (!imageUploadedResult.upload)
-        //            return new ServiceResponse(false, imageUploadedResult.errorMessage!);
+            foreach (var image in product!.Images)
+                _imageService.Delete(image.Image);
 
-        //        mappedData.Images.Add(new ProductImage() { Image = $"Images/Product/{imageName}" });
-        //    }
+            product.Images.Clear();
+            foreach (var image in model.Images)
+            {
+                var imageName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+                var imageUploadedResult = await _imageService.UploadImage(image, imageName, "Images/Product");
 
-        //    int result = await _productRepository.UpdateAsync(mappedData);
-        //    return result > 0 ? new ServiceResponse(true, "Product Updated!")
-        //       : new ServiceResponse(false, "Product failed to be Updated!");
-        //}
-    
+                if (!imageUploadedResult.upload)
+                    return new ServiceResponse(false, imageUploadedResult.errorMessage!);
+
+                product.Images.Add(new ProductImage() { Image = $"Images/Product/{imageName}" });
+            }
+            product.UpdatedDate = DateTime.UtcNow;
+            int result = await _productRepository.UpdateAsync(product);
+            return result > 0 ? new ServiceResponse(true, "Product Updated!")
+               : new ServiceResponse(false, "Product failed to be Updated!");
+        }
+
     }
 }

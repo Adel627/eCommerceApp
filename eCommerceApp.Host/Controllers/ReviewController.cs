@@ -23,6 +23,13 @@ namespace eCommerceApp.Host.Controllers
             return result.Success ? Ok(result) : NotFound(result);
         }
 
+        [HttpGet("product/rates/{productId}")]
+        public async Task<IActionResult> GetAllProductRates(Guid productId)
+        {
+            var result = await _reviewService.GetAllProductReviewAsync(productId);
+            return result.Success ? Ok(result.Value) : NotFound(result);
+
+        }
         [HttpGet("all-user-rates")]
         public async Task<IActionResult> GetAllRates()
         {

@@ -80,28 +80,52 @@ namespace eCommerceApp.Application.Services.Implementations
             return new ServiceResponse<CheckoutResponse>(true,Value: checkoutResponse);
 
         }
-    
-        public async Task<ServiceResponse> ConfirmPay(string sessionId)
+
+        public async Task ConfirmPayWebhook(string paymentIntendId)
         {
-            var paymentStatus = await _stripePaymentService.GetPaymentStatus(sessionId);
 
-            if (paymentStatus == PaymentStatus.NotFound)
-                return new ServiceResponse(false, "There are no sessions with this Id");
+            var payment = await _paymentRepository.GetPaymentWithOrder(paymentIntendId);
 
-            var payment = await _paymentRepository.GetPaymentWithOrder(sessionId);
+            payment!.Status = PaymentStatus.Paid;
+            payment.PaymentIntentId = paymentIntendId;
 
-            payment!.Status = paymentStatus;
-
-            if(paymentStatus == PaymentStatus.Failed)
-            {
-                await _paymentRepository.UpdateAsync(payment);
-                return new ServiceResponse(false, "Failed to confirm this session");
-            }
             payment.Order.OrderStatus = OrderStatus.Paid;
 
             await _paymentRepository.UpdateAsync(payment);
 
-            return new ServiceResponse(true, "Payment Confirmed");
         }
+        public async Task UpdatePayFailed(string paymentIntendId)
+        {
+
+            var payment = await _paymentRepository.GetPaymentWithOrder(paymentIntendId);
+
+            payment!.Status = PaymentStatus.Failed;
+
+            await _paymentRepository.UpdateAsync(payment);
+            
+        }
+
+        //public async Task<ServiceResponse> ConfirmPay(string sessionId)
+        //{
+        //    var paymentStatus = await _stripePaymentService.GetPaymentStatus(sessionId);
+
+        //    if (paymentStatus == PaymentStatus.NotFound)
+        //        return new ServiceResponse(false, "There are no sessions with this Id");
+
+        //    var payment = await _paymentRepository.GetPaymentWithOrder(sessionId);
+
+        //    payment!.Status = paymentStatus;
+
+        //    if (paymentStatus == PaymentStatus.Failed)
+        //    {
+        //        await _paymentRepository.UpdateAsync(payment);
+        //        return new ServiceResponse(false, "Failed to confirm this session");
+        //    }
+        //    payment.Order.OrderStatus = OrderStatus.Paid;
+
+        //    await _paymentRepository.UpdateAsync(payment);
+
+        //    return new ServiceResponse(true, "Payment Confirmed");
+        //}
     }
 }

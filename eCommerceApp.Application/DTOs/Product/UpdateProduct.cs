@@ -6,5 +6,6 @@ namespace eCommerceApp.Application.DTOs.Product
     {
         [Required]
         public Guid Id { get; set; }
+
     }
 }

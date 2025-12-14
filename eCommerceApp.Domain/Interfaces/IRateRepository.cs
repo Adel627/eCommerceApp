@@ -9,5 +9,6 @@ namespace eCommerceApp.Domain.Interfaces
     {
         Task<Rates?> GetByUserIdandProductId(string userId , Guid productId);
         Task<IEnumerable<Rates>> GetByUserId(string userId );
+        Task<IEnumerable<Rates>> GetByProductId(Guid productId);
     }
 }

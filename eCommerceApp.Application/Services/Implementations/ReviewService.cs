@@ -4,9 +4,6 @@ using eCommerceApp.Application.Services.Interfaces;
 using eCommerceApp.Domain.Entities;
 using eCommerceApp.Domain.Interfaces;
 using MapsterMapper;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eCommerceApp.Application.Services.Implementations
 {
@@ -30,7 +27,13 @@ namespace eCommerceApp.Application.Services.Implementations
             {
                 userRate.Rate = request.Rate;
                 userRate.UpdatedDate = DateTime.UtcNow;
+
                 await _rateRepository.UpdateAsync(userRate);
+
+                var rates = await _rateRepository.GetByProductId(request.ProductId);
+                product.AverageRating = rates.Average(r => r.Rate);
+
+                await _productRepository.UpdateAsync(product);
                 return new ServiceResponse(true, "Rate Saved");
 
             }
@@ -38,6 +41,11 @@ namespace eCommerceApp.Application.Services.Implementations
             rate.UserId = UserId;
 
             await _rateRepository.AddAsync(rate);
+
+            var Rates = await _rateRepository.GetByProductId(request.ProductId);
+            product.AverageRating = Rates.Average(r => r.Rate);
+
+            await _productRepository.UpdateAsync(product);
             return new ServiceResponse(true, "Rate Saved");
         }
         public async Task<ServiceResponse> DeleteRate(Guid Id)
@@ -47,6 +55,12 @@ namespace eCommerceApp.Application.Services.Implementations
                 return new ServiceResponse(false, "There are no Rates with this Id");
 
             await _rateRepository.DeleteAsync(Id);
+
+            var product = await _productRepository.GetByIdAsync(Rate.ProductId);
+            var Rates = await _rateRepository.GetByProductId(product!.Id);
+            product.AverageRating = Rates.Average(r => r.Rate);
+
+            await _productRepository.UpdateAsync(product);
             return new ServiceResponse(true, "Rate Deleted!!");
 
         }
@@ -58,6 +72,23 @@ namespace eCommerceApp.Application.Services.Implementations
                 : _mapper.Map<IEnumerable<RateResponse>>(rates);
         }
 
+        public async Task <ServiceResponse<ProductReview>> GetAllProductReviewAsync(Guid ProductId)
+        {
+            var product = await _productRepository.GetCurrentByIdAsync(ProductId);
+
+            if(product == null)
+                return new ServiceResponse<ProductReview>(false , "There are no products with the given Id");
+      
+            var rates = await _rateRepository.GetByProductId(ProductId);
+            var comments = await _commentRepository.GetByProductId(ProductId);
+            var productReview = new ProductReview
+            {
+                RateResponse = _mapper.Map<IEnumerable<RateResponse>>(rates),
+                CommentResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments)
+            };
+            return 
+                new ServiceResponse<ProductReview>(true,Value: productReview);
+        }
         public async Task<ServiceResponse> AddComment(CommentRequest request, string UserId)
         {
 

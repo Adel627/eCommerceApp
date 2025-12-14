@@ -10,6 +10,8 @@ namespace eCommerceApp.Application.Services.Interfaces
     {
         Task<ServiceResponse> RateProduct(RateRequest request , string UserId);
         Task<IEnumerable<RateResponse>> GetAllRatesAsync(string UserId);
+        Task<ServiceResponse<ProductReview>> GetAllProductReviewAsync(Guid ProductId);
+
         Task<ServiceResponse> DeleteRate(Guid Id);
         Task<ServiceResponse> AddComment(CommentRequest request , string UserId);
         Task<IEnumerable<CommentResponse>> GetAllCommentsAsync(string UserId);
